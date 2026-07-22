@@ -1,22 +1,41 @@
 rules_version = '2';
 
-// =============================================================================
-// ⚠️  PLACEHOLDER — REPLACE WITH THE PROJECT'S ACTUAL DEPLOYED RULES.
-//
-// The real security rules were authored and deployed out-of-band (they enforce
-// the allowlist check for every /users/{uid}/** path and restrict each user to
-// reading only their own /allowlist/{email} entry). Paste them here so the repo
-// is the source of truth and `firebase deploy --only firestore:rules` matches
-// what's live.
-//
-// Until then this stand-in DENIES EVERYTHING so an accidental deploy can't open
-// the database up.
-// =============================================================================
-
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // Deny everything by default. Every allow below is a deliberate
+    // exception; nothing is reachable that isn't explicitly opened.
     match /{document=**} {
       allow read, write: if false;
+    }
+
+    // No Cloud Functions on the Spark plan, so there's no blocking
+    // function to check the allowlist before sign-in. Instead, a
+    // user may read ONLY their own allowlist entry (never anyone
+    // else's) so the client can check its own status after signing
+    // in and route to the not-authorized screen if absent. Writes
+    // stay fully denied — the allowlist is managed by hand in the
+    // console.
+    match /allowlist/{email} {
+      allow read: if request.auth != null && request.auth.token.email == email;
+      allow write: if false;
+    }
+
+    // User-data access additionally requires the signed-in email to
+    // have an allowlist entry, so even if the client-side redirect
+    // to the not-authorized screen is somehow bypassed, an
+    // unlisted user still cannot read or write any task/routine
+    // data.
+    match /users/{uid} {
+      allow read, write: if request.auth != null
+        && request.auth.uid == uid
+        && exists(/databases/$(database)/documents/allowlist/$(request.auth.token.email));
+
+      match /{subcollection}/{docId} {
+        allow read, write: if request.auth != null
+          && request.auth.uid == uid
+          && exists(/databases/$(database)/documents/allowlist/$(request.auth.token.email));
+      }
     }
   }
 }

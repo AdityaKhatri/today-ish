@@ -1,97 +1,91 @@
 import type { Timestamp } from 'firebase/firestore'
-import type { Effort } from '@/lib/scoring'
 
 /**
- * Domain types.
- *
- * PROVISIONAL — this mirrors the brief + mockups and is pending exact
- * reconciliation with DATA_MODEL.md (field names, doc-id conventions, and which
- * fields are required). The Firestore read/write layer in `src/data/` is the
- * single place that will change if the schema differs.
+ * Domain types — match DATA_MODEL.md exactly, except two fields marked ADDED
+ * (needed for the few-times-per-day / "multi" window type, which the schema
+ * doesn't otherwise represent). Those are flagged for reconciliation.
  */
 
 export type Profile = 'personal' | 'work'
 /** The Home/Tasks/Routines segmented control adds an "all" view over the two profiles. */
 export type ProfileFilter = Profile | 'all'
 
-// ── Tasks (one-off, deadline-bound, decay model) ─────────────────────────────
+// ── /users/{uid} ─────────────────────────────────────────────────────────────
+
+export interface UserDoc {
+  email: string
+  displayName: string
+  photoURL: string
+  createdAt: Timestamp
+  defaultProfile: Profile
+}
+
+// ── /users/{uid}/tasks/{taskId} ──────────────────────────────────────────────
+
+export type TaskStatus = 'active' | 'completed'
 
 export interface Task {
   id: string
   title: string
-  notes?: string
+  notes: string | null
+  /** "personal" | "work" | "errands" | custom */
+  category: string
   profile: Profile
-  category?: string
-  effort: Effort
-
-  /** Frozen at add-time. */
+  status: TaskStatus
+  createdAt: Timestamp
+  deadline: Timestamp | null
+  /** 5 | 15 | 30 | 60 */
+  effortMinutes: number
+  /** frozen at add-time */
   baseScore: number
   urgencyMultiplier: number
   decayRatePerDay: number
-
-  createdAt: Timestamp
-  deadline: Timestamp
-
-  completed: boolean
-  /** Client-side `Timestamp.now()` at the instant of the tap (offline-correct). */
-  completedAt?: Timestamp | null
-  /** Live score locked in at completion. */
-  scoreAtCompletion?: number | null
+  /** CLIENT-set `Timestamp.now()` at the tap — never serverTimestamp(). */
+  completedAt: Timestamp | null
+  scoreAtCompletion: number | null
 }
 
-// ── Routines (recurring, daily-reset, NO decay) ──────────────────────────────
+// ── /users/{uid}/routines/{routineId} ────────────────────────────────────────
 
-export type RoutineWindow =
-  | 'fixed-time'
-  | 'flexible-window'
-  | 'anytime-today'
-  | 'few-times-per-day'
+export type RoutineWindow = 'fixed' | 'flexible' | 'anytime' | 'multi'
 
 export interface Routine {
   id: string
   title: string
+  category: string
   profile: Profile
-  category?: string
-
   windowType: RoutineWindow
-  /** few-times-per-day */
-  timesPerDay?: number
-  /** fixed-time, "HH:mm" (local) */
-  fixedTime?: string
-  /** flexible-window, "HH:mm" (local) */
-  windowStart?: string
-  windowEnd?: string
-
-  /** Days the routine is active. 0 = Sunday … 6 = Saturday. */
-  daysOfWeek: number[]
-  reminderOn: boolean
-
-  /** Maintained transactionally on the doc — NOT recomputed from logs on read. */
+  /** "06:00" 24h local time */
+  windowStart: string | null
+  windowEnd: string | null
+  /** 0 = Sunday … 6 = Saturday */
+  repeatDays: number[]
+  reminderEnabled: boolean
+  createdAt: Timestamp
+  /** maintained transactionally on this doc — not recomputed from logs on read */
   currentStreak: number
   longestStreak: number
-
-  createdAt: Timestamp
+  /** "2026-07-22" local date string */
+  lastCompletedDate: string | null
+  /** ADDED beyond DATA_MODEL.md — target completions/day for windowType "multi". */
+  targetCount?: number | null
 }
 
-export type RoutineStatus = 'hit' | 'miss'
+// ── /users/{uid}/routineLogs/{routineId}_{date} ──────────────────────────────
 
-/** Audit trail for hit-rate stats. Doc id: `${routineId}_${date}`. Not the fast path. */
+export type RoutineLogStatus = 'done' | 'missed'
+
 export interface RoutineLog {
   id: string
   routineId: string
-  /** YYYY-MM-DD (local) */
+  /** "2026-07-22" — embedded in the doc id */
   date: string
-  status: RoutineStatus
-  /** few-times-per-day progress toward timesPerDay */
+  status: RoutineLogStatus
+  /** CLIENT-set timestamp */
+  completedAt: Timestamp | null
+  /** ADDED beyond DATA_MODEL.md — progress toward targetCount for "multi". */
   count?: number
-  completedAt?: Timestamp | null
 }
 
-// ── User ─────────────────────────────────────────────────────────────────────
-
-export interface UserDoc {
-  email: string
-  displayName?: string
-  activeProfile: Profile
-  createdAt: Timestamp
-}
+// ── /users/{uid}/dailyBrief/{date} — unused this build (AI deferred) ─────────
+// ── /users/{uid}/pushTokens/{tokenId} — unused this build (FCM deferred) ─────

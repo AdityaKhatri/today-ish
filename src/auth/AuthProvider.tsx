@@ -24,12 +24,13 @@ async function ensureUserDoc(user: User): Promise<void> {
   const ref = doc(db, 'users', user.uid)
   const snap = await getDoc(ref)
   if (!snap.exists()) {
-    // Field set is PROVISIONAL pending DATA_MODEL.md.
+    // Matches /users/{uid} in DATA_MODEL.md.
     await setDoc(ref, {
-      email: user.email,
-      displayName: user.displayName ?? null,
-      activeProfile: 'personal',
+      email: user.email ?? '',
+      displayName: user.displayName ?? '',
+      photoURL: user.photoURL ?? '',
       createdAt: serverTimestamp(),
+      defaultProfile: 'personal',
     })
   }
 }

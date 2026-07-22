@@ -28,20 +28,31 @@ const DAY_MS = 24 * 60 * 60 * 1000
 const HOUR_MS = 60 * 60 * 1000
 
 // ── Effort → base score (sub-linear) ─────────────────────────────────────────
+// The schema stores `effortMinutes` (5, 15, 30, 60). The curve is sub-linear:
+// doubling+ the minutes does NOT double the score.
 
-export type Effort = '5min' | '15min' | '30min' | '1hr+'
-
-export const EFFORTS: readonly Effort[] = ['5min', '15min', '30min', '1hr+'] as const
-
-export const BASE_SCORE_BY_EFFORT: Record<Effort, number> = {
-  '5min': 20,
-  '15min': 35,
-  '30min': 50,
-  '1hr+': 90,
+export interface EffortOption {
+  minutes: number
+  label: string
 }
 
-export function baseScoreForEffort(effort: Effort): number {
-  return BASE_SCORE_BY_EFFORT[effort]
+export const EFFORT_OPTIONS: readonly EffortOption[] = [
+  { minutes: 5, label: '5min' },
+  { minutes: 15, label: '15min' },
+  { minutes: 30, label: '30min' },
+  { minutes: 60, label: '1hr+' },
+] as const
+
+export function baseScoreForEffortMinutes(minutes: number): number {
+  if (minutes >= 60) return 90
+  if (minutes >= 30) return 50
+  if (minutes >= 15) return 35
+  return 20
+}
+
+/** Human label for a stored `effortMinutes` value. */
+export function effortLabel(minutes: number): string {
+  return minutes >= 60 ? '1hr+' : `${minutes}min`
 }
 
 // ── Urgency multiplier (frozen at add-time) ──────────────────────────────────

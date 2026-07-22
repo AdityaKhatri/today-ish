@@ -16,6 +16,12 @@ export function startOfLocalDay(d: Date = new Date()): Date {
   return x
 }
 
+/** The local-date key for the day before the given `YYYY-MM-DD` key. */
+export function previousDateKey(dateKey: string): string {
+  const d = new Date(`${dateKey}T00:00:00`)
+  return localDateKey(new Date(d.getTime() - DAY_MS))
+}
+
 /** 0 = Sunday … 6 = Saturday (JS `getDay`). */
 export function localDayOfWeek(d: Date = new Date()): number {
   return d.getDay()

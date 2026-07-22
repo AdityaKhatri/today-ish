@@ -5,33 +5,46 @@ import { ChoiceChip } from '@/components/ui/ChoiceChip'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { Stepper } from '@/components/ui/Stepper'
 import { Toggle } from '@/components/ui/Toggle'
+import { useData } from '@/data/DataProvider'
 import { cn } from '@/lib/cn'
+import { useProfile } from '@/state/ProfileContext'
 import type { RoutineWindow } from '@/types/models'
 import styles from './RoutineEditorScreen.module.css'
 
 const WINDOW_OPTIONS: ReadonlyArray<{ value: RoutineWindow; label: string }> = [
-  { value: 'flexible-window', label: 'Flexible' },
-  { value: 'fixed-time', label: 'Fixed time' },
-  { value: 'anytime-today', label: 'Anytime' },
-  { value: 'few-times-per-day', label: 'Few times/day' },
+  { value: 'flexible', label: 'Flexible' },
+  { value: 'fixed', label: 'Fixed time' },
+  { value: 'anytime', label: 'Anytime' },
+  { value: 'multi', label: 'Few times/day' },
 ]
 
-// Display order Mon…Sun; index maps to daysOfWeek later (0=Sun via % 7).
+// Display order Mon…Sun. repeatDays uses 0=Sun…6=Sat, so index i → (i + 1) % 7.
 const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+const dayIndexToNumber = (i: number) => (i + 1) % 7
 
 export function RoutineEditorScreen() {
   const navigate = useNavigate()
   const { id } = useParams()
+  const { routines, createRoutine, updateRoutine } = useData()
+  const { activeProfile } = useProfile()
+
+  const existing = id ? routines.find((r) => r.id === id) : undefined
   const isEdit = Boolean(id)
 
-  const [title, setTitle] = useState('')
-  const [windowType, setWindowType] = useState<RoutineWindow>('few-times-per-day')
-  const [timesPerDay, setTimesPerDay] = useState(3)
-  const [fixedTime, setFixedTime] = useState('08:00')
-  const [windowStart, setWindowStart] = useState('06:00')
-  const [windowEnd, setWindowEnd] = useState('11:00')
-  const [days, setDays] = useState<boolean[]>([true, true, true, true, true, false, false])
-  const [reminderOn, setReminderOn] = useState(true)
+  const [title, setTitle] = useState(existing?.title ?? '')
+  const [windowType, setWindowType] = useState<RoutineWindow>(existing?.windowType ?? 'multi')
+  const [timesPerDay, setTimesPerDay] = useState(existing?.targetCount ?? 3)
+  const [fixedTime, setFixedTime] = useState(
+    existing?.windowType === 'fixed' ? (existing.windowStart ?? '08:00') : '08:00',
+  )
+  const [windowStart, setWindowStart] = useState(existing?.windowStart ?? '06:00')
+  const [windowEnd, setWindowEnd] = useState(existing?.windowEnd ?? '11:00')
+  const [days, setDays] = useState<boolean[]>(() =>
+    existing
+      ? DAY_LABELS.map((_, i) => existing.repeatDays.includes(dayIndexToNumber(i)))
+      : [true, true, true, true, true, false, false],
+  )
+  const [reminderOn, setReminderOn] = useState(existing?.reminderEnabled ?? true)
 
   const canSave = title.trim().length > 0
 
@@ -40,19 +53,26 @@ export function RoutineEditorScreen() {
   }
 
   function handleSave() {
-    // TODO(data layer): create/update /users/{uid}/routines with these fields;
-    // streaks are maintained transactionally on the routine doc.
-    console.info('[today-ish] saveRoutine (not yet persisted)', {
-      id,
+    const repeatDays = days
+      .map((on, i) => (on ? dayIndexToNumber(i) : -1))
+      .filter((n) => n >= 0)
+      .sort((a, b) => a - b)
+
+    const input = {
       title,
+      category: existing?.category ?? activeProfile,
+      profile: existing?.profile ?? activeProfile,
       windowType,
-      timesPerDay,
-      fixedTime,
-      windowStart,
-      windowEnd,
-      days,
-      reminderOn,
-    })
+      windowStart: windowType === 'fixed' ? fixedTime : windowType === 'flexible' ? windowStart : null,
+      windowEnd: windowType === 'flexible' ? windowEnd : null,
+      repeatDays,
+      reminderEnabled: reminderOn,
+      targetCount: windowType === 'multi' ? timesPerDay : null,
+    }
+
+    // Instant-optimistic write; local cache reflects it immediately.
+    if (isEdit && id) void updateRoutine(id, input)
+    else void createRoutine(input)
     navigate('/routines')
   }
 
@@ -99,7 +119,7 @@ export function RoutineEditorScreen() {
         ))}
       </div>
 
-      {windowType === 'few-times-per-day' && (
+      {windowType === 'multi' && (
         <>
           <SectionLabel className={styles.label}>How many times</SectionLabel>
           <div className={styles.section}>
@@ -114,7 +134,7 @@ export function RoutineEditorScreen() {
         </>
       )}
 
-      {windowType === 'fixed-time' && (
+      {windowType === 'fixed' && (
         <>
           <SectionLabel className={styles.label}>At</SectionLabel>
           <div className={styles.timeRow}>
@@ -128,7 +148,7 @@ export function RoutineEditorScreen() {
         </>
       )}
 
-      {windowType === 'flexible-window' && (
+      {windowType === 'flexible' && (
         <>
           <SectionLabel className={styles.label}>Window</SectionLabel>
           <div className={styles.timeRow}>

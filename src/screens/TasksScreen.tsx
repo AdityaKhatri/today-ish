@@ -6,9 +6,11 @@ import { BottomNav } from '@/components/layout/BottomNav'
 import { Screen } from '@/components/layout/Screen'
 import { Button } from '@/components/ui/Button'
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
+import { useData } from '@/data/DataProvider'
 import { PROFILE_OPTIONS } from '@/lib/profileOptions'
 import type { UrgencyTier } from '@/lib/scoring'
-import { MOCK_TASKS, filterByProfile, sumBleed, sumPotential } from '@/mock/fixtures'
+import { matchesProfile } from '@/lib/taskFilters'
+import { buildTaskView, sumBleed, sumLive } from '@/lib/views'
 import { useProfile } from '@/state/ProfileContext'
 import { useNow } from '@/state/useNow'
 import styles from './TasksScreen.module.css'
@@ -18,14 +20,16 @@ const TIER_RANK: Record<UrgencyTier, number> = { red: 0, amber: 1, green: 2 }
 export function TasksScreen() {
   const navigate = useNavigate()
   const { filter, setFilter } = useProfile()
-  useNow() // keep scores live while the tab is open
+  const { tasks } = useData()
+  const now = useNow() // keep scores live while the tab is open
 
-  const tasks = useMemo(
+  const views = useMemo(
     () =>
-      filterByProfile(MOCK_TASKS, filter).sort(
-        (a, b) => TIER_RANK[a.tier] - TIER_RANK[b.tier] || b.live - a.live,
-      ),
-    [filter],
+      tasks
+        .filter((t) => matchesProfile(t.profile, filter))
+        .map((t) => buildTaskView(t, now))
+        .sort((a, b) => TIER_RANK[a.tier] - TIER_RANK[b.tier] || b.live - a.live),
+    [tasks, filter, now],
   )
 
   const footer = (
@@ -46,11 +50,11 @@ export function TasksScreen() {
         <SegmentedControl options={PROFILE_OPTIONS} value={filter} onChange={setFilter} large />
       </div>
       <div className={styles.score}>
-        <ScoreHeadline potential={sumPotential(tasks)} bleed={sumBleed(tasks)} compact />
+        <ScoreHeadline potential={sumLive(views)} bleed={sumBleed(views)} compact />
       </div>
 
-      {tasks.length > 0 ? (
-        tasks.map((t) => (
+      {views.length > 0 ? (
+        views.map((t) => (
           <TaskCard key={t.id} task={t} onClick={() => navigate(`/tasks/${t.id}`)} />
         ))
       ) : (

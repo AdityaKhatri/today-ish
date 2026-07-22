@@ -33,14 +33,15 @@ Runs on the Firebase **Spark (free) plan** — no Cloud Functions.
 ## Prerequisites
 
 - Node.js **18.18+** (built on 18.20)
+- **pnpm** (this repo uses pnpm; built on 11.3)
 - A Firebase project with **Firestore** (production mode) and **Google Auth**
   enabled, and the security rules deployed
-- The [Firebase CLI](https://firebase.google.com/docs/cli) for deploys (`npm i -g firebase-tools`)
+- The [Firebase CLI](https://firebase.google.com/docs/cli) for deploys (`pnpm add -g firebase-tools`)
 
 ## Setup
 
 ```bash
-npm install
+pnpm install
 cp .env.example .env.local   # then fill in your Firebase web config
 ```
 
@@ -61,10 +62,10 @@ Firestore rules + the allowlist, not by hiding these.
 ## Develop
 
 ```bash
-npm run dev        # Vite dev server
-npm run typecheck  # tsc --noEmit
-npm run build      # typecheck + production build to dist/
-npm run preview    # serve the production build (service worker active here)
+pnpm dev        # Vite dev server
+pnpm typecheck  # tsc --noEmit
+pnpm build      # typecheck + production build to dist/
+pnpm preview    # serve the production build (service worker active here)
 ```
 
 > The PWA service worker is disabled in dev (`devOptions.enabled: false`) and
@@ -79,7 +80,7 @@ firebase use <your-project-id>
 firebase deploy --only firestore:rules
 
 # Hosting (builds to dist/):
-npm run build
+pnpm build
 firebase deploy --only hosting
 ```
 
@@ -107,10 +108,10 @@ src/
   firebase/config.ts       # app init + Firestore offline persistence
   auth/                    # Google sign-in + allowlist gate + ensureUserDoc
   state/                   # ProfileContext, useNow (live clock), useOnline
-  types/models.ts          # domain types (provisional; see below)
+  types/models.ts          # domain types (match DATA_MODEL.md)
+  data/                    # Firestore layer: paths, tasks, routines, DataProvider
   components/               # icons, Logo, layout (Screen/BottomNav), ui/, domain/
   screens/                 # the 13 screens
-  mock/fixtures.ts          # sample data until the Firestore layer is wired
 ```
 
 ## Core mechanics
@@ -146,17 +147,29 @@ manifest + service worker.
 
 ---
 
-## Known blocker (next step)
+## Data layer
 
-The Firestore **data layer is not yet wired** — screens currently read
-`src/mock/fixtures.ts`. This is waiting on the exact **`DATA_MODEL.md`** and the
-**deployed `firestore.rules`**, which pin down field names, doc-id conventions,
-and the allowlist shape. Once provided:
-1. reconcile `src/types/models.ts` to the exact schema,
-2. add a `src/data/` layer (task/routine CRUD, optimistic completions,
-   transactional streaks, `routineLogs`),
-3. replace fixtures, and
-4. drop the real rules into `firestore.rules`.
+Wired against `DATA_MODEL.md` and the deployed `firestore.rules`. `src/data/`
+holds live `onSnapshot` subscriptions (active tasks, routines, today's logs) via
+`DataProvider`, plus task CRUD, optimistic completions (client `Timestamp.now()`
+at the tap), and transactional routine streaks with an idempotent
+`routineLogs/{routineId}_{date}` audit trail. All queries are single-field, so
+no composite indexes are required.
 
-The scoring constants in `scoring.ts` (urgency thresholds, decay derivation) are
-also flagged for reconciliation against `DATA_MODEL.md`.
+### To confirm with the schema owner
+- **Two added fields** beyond `DATA_MODEL.md`, needed for the `multi`
+  (few-times-per-day) window type: `targetCount` on the routine and `count` on
+  the log. The schema has no other place to store a per-day target/progress.
+- **Decay anchor:** live score decays from `baseScore × urgencyMultiplier`
+  starting at `createdAt`, accelerating past the deadline. The tunable constants
+  (urgency thresholds, decay fraction, acceleration) live in `src/lib/scoring.ts`
+  and are easy to adjust if the intended curve differs.
+- `DATA_MODEL.md`'s `/allowlist` note (Admin-SDK-only via a blocking function)
+  is superseded by the deployed rules, which let a user read their own entry —
+  the client check matches the deployed rules.
+
+## Still deferred (unchanged)
+
+FCM/background push, the AI morning brief + ask-AI backend, and Cloud Functions
+remain out until the Blaze plan (see `functions/README.md`). Their UI slots exist
+and are inert.

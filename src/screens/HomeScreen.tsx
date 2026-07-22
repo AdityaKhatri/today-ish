@@ -13,16 +13,12 @@ import { ProgressRing } from '@/components/ui/ProgressRing'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import { useAuth } from '@/auth/useAuth'
+import { useData } from '@/data/DataProvider'
 import { formatLongDate } from '@/lib/dates'
 import { PROFILE_OPTIONS } from '@/lib/profileOptions'
 import type { UrgencyTier } from '@/lib/scoring'
-import {
-  MOCK_ROUTINES,
-  MOCK_TASKS,
-  filterByProfile,
-  sumBleed,
-  sumPotential,
-} from '@/mock/fixtures'
+import { matchesProfile } from '@/lib/taskFilters'
+import { buildTaskView, isRoutineDone, routineActiveOn, sumBleed, sumLive } from '@/lib/views'
 import { useProfile } from '@/state/ProfileContext'
 import { useNow } from '@/state/useNow'
 import styles from './HomeScreen.module.css'
@@ -33,20 +29,30 @@ export function HomeScreen() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { filter, setFilter } = useProfile()
+  const { tasks, routines, todayLogs } = useData()
   const now = useNow() // re-render each minute so scores/urgency stay live
 
   const firstName = user?.displayName?.split(' ')[0] ?? 'there'
 
-  const tasks = useMemo(() => filterByProfile(MOCK_TASKS, filter), [filter])
-  const topPriorities = useMemo(
+  const views = useMemo(
     () =>
-      [...tasks]
-        .sort((a, b) => TIER_RANK[a.tier] - TIER_RANK[b.tier] || b.bleed - a.bleed)
-        .slice(0, 4),
-    [tasks],
+      tasks
+        .filter((t) => matchesProfile(t.profile, filter))
+        .map((t) => buildTaskView(t, now))
+        .sort((a, b) => TIER_RANK[a.tier] - TIER_RANK[b.tier] || b.bleed - a.bleed),
+    [tasks, filter, now],
   )
-  const routines = useMemo(() => filterByProfile(MOCK_ROUTINES, filter), [filter])
-  const doneCount = routines.filter((r) => r.status === 'done').length
+  const topPriorities = views.slice(0, 4)
+
+  const { doneCount, total, maxStreak } = useMemo(() => {
+    const dow = new Date(now).getDay()
+    const active = routines.filter((r) => matchesProfile(r.profile, filter) && routineActiveOn(r, dow))
+    return {
+      doneCount: active.filter((r) => isRoutineDone(r, todayLogs[r.id])).length,
+      total: active.length,
+      maxStreak: active.reduce((m, r) => Math.max(m, r.currentStreak), 0),
+    }
+  }, [routines, todayLogs, filter, now])
 
   return (
     <Screen footer={<BottomNav />} overlay={<AskAiFab />} contentClassName={styles.content}>
@@ -60,11 +66,7 @@ export function HomeScreen() {
           <div className={styles.greeting}>Hi, {firstName}</div>
           <div className={styles.date}>{formatLongDate(new Date(now))}</div>
         </div>
-        <button
-          className={styles.addBtn}
-          aria-label="Add task"
-          onClick={() => navigate('/add')}
-        >
+        <button className={styles.addBtn} aria-label="Add task" onClick={() => navigate('/add')}>
           <PlusIcon size={24} />
         </button>
       </div>
@@ -72,7 +74,7 @@ export function HomeScreen() {
       <MorningBriefCard />
 
       <div className={styles.score}>
-        <ScoreHeadline potential={sumPotential(tasks)} bleed={sumBleed(tasks)} />
+        <ScoreHeadline potential={sumLive(views)} bleed={sumBleed(views)} />
       </div>
 
       <div className={styles.switcher}>
@@ -90,12 +92,14 @@ export function HomeScreen() {
 
       <SectionLabel className={styles.routinesLabel}>Today&rsquo;s routines</SectionLabel>
       <button className={styles.routineCard} onClick={() => navigate('/routines')}>
-        <ProgressRing value={doneCount} max={routines.length} size={44} />
+        <ProgressRing value={doneCount} max={total} size={44} />
         <div>
           <div className={styles.summaryTitle}>
-            {doneCount} of {routines.length} done
+            {doneCount} of {total} done
           </div>
-          <div className={styles.summarySub}>12-day streak · 86% hit rate</div>
+          <div className={styles.summarySub}>
+            {maxStreak > 0 ? `${maxStreak}-day streak` : 'No streak yet'}
+          </div>
         </div>
       </button>
     </Screen>

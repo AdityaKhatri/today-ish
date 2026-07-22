@@ -1,5 +1,6 @@
 import { AppRoutes } from '@/app/AppRoutes'
 import { Splash } from '@/components/Splash'
+import { DataProvider } from '@/data/DataProvider'
 import { NotAuthorizedScreen } from '@/screens/NotAuthorizedScreen'
 import { SignInScreen } from '@/screens/SignInScreen'
 import { useAuth } from '@/auth/useAuth'
@@ -15,5 +16,9 @@ export function App() {
   if (status === 'loading' || status === 'checking') return <Splash />
   if (status === 'signedOut') return <SignInScreen />
   if (status === 'denied') return <NotAuthorizedScreen />
-  return <AppRoutes />
+  return (
+    <DataProvider>
+      <AppRoutes />
+    </DataProvider>
+  )
 }

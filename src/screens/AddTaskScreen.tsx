@@ -2,17 +2,17 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Screen } from '@/components/layout/Screen'
 import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
 import { ChoiceChip } from '@/components/ui/ChoiceChip'
 import { SectionLabel } from '@/components/ui/SectionLabel'
-import { Card } from '@/components/ui/Card'
+import { useData } from '@/data/DataProvider'
 import {
-  EFFORTS,
-  baseScoreForEffort,
+  EFFORT_OPTIONS,
+  baseScoreForEffortMinutes,
   peakScore,
   suggestedDecayRatePerDay,
   urgencyMultiplierForDeadline,
 } from '@/lib/scoring'
-import type { Effort } from '@/lib/scoring'
 import type { Profile } from '@/types/models'
 import { useProfile } from '@/state/ProfileContext'
 import styles from './AddTaskScreen.module.css'
@@ -39,19 +39,18 @@ function endOfDay(d: Date): Date {
   return x
 }
 
-function deadlineToMs(choice: DeadlineChoice, pickedISO: string): number {
+function deadlineToDate(choice: DeadlineChoice, pickedISO: string): Date {
   const now = new Date()
-  if (choice === 'today') return endOfDay(now).getTime()
-  if (choice === 'tomorrow') return endOfDay(new Date(now.getTime() + 86_400_000)).getTime()
-  if (choice === 'week') return endOfDay(new Date(now.getTime() + 7 * 86_400_000)).getTime()
-  // pick
-  const picked = pickedISO ? new Date(`${pickedISO}T23:59:59`) : new Date(now.getTime() + 3 * 86_400_000)
-  return endOfDay(picked).getTime()
+  if (choice === 'today') return endOfDay(now)
+  if (choice === 'tomorrow') return endOfDay(new Date(now.getTime() + 86_400_000))
+  if (choice === 'week') return endOfDay(new Date(now.getTime() + 7 * 86_400_000))
+  return endOfDay(pickedISO ? new Date(`${pickedISO}T23:59:59`) : new Date(now.getTime() + 3 * 86_400_000))
 }
 
 export function AddTaskScreen() {
   const navigate = useNavigate()
   const { activeProfile } = useProfile()
+  const { createTask } = useData()
 
   const [step, setStep] = useState<1 | 2>(1)
   const [title, setTitle] = useState('')
@@ -59,39 +58,35 @@ export function AddTaskScreen() {
   const [profile, setProfile] = useState<Profile>(activeProfile)
   const [deadline, setDeadline] = useState<DeadlineChoice>('today')
   const [pickedISO, setPickedISO] = useState('')
-  const [effort, setEffort] = useState<Effort>('30min')
+  const [effortMinutes, setEffortMinutes] = useState(30)
 
   const preview = useMemo(() => {
     const now = Date.now()
-    const deadlineMs = deadlineToMs(deadline, pickedISO)
-    const base = baseScoreForEffort(effort)
+    const deadlineMs = deadlineToDate(deadline, pickedISO).getTime()
+    const base = baseScoreForEffortMinutes(effortMinutes)
     const urgency = urgencyMultiplierForDeadline(now, deadlineMs)
     return {
       peak: peakScore(base, urgency),
       decay: suggestedDecayRatePerDay(base, urgency),
       urgency,
     }
-  }, [deadline, pickedISO, effort])
+  }, [deadline, pickedISO, effortMinutes])
+
+  const canSave = title.trim().length > 0
 
   function handleSave() {
-    // TODO(data layer — blocked on DATA_MODEL.md/firestore.rules):
-    // persist to /users/{uid}/tasks with FROZEN baseScore, urgencyMultiplier,
-    // decayRatePerDay and a client-side createdAt Timestamp. Until then this is
-    // a no-op that returns to the list.
-    console.info('[today-ish] createTask (not yet persisted)', {
+    // Instant-optimistic: fire the write (local cache reflects it immediately)
+    // and return to the list. baseScore/urgency/decay are frozen at add-time.
+    void createTask({
       title,
-      notes,
+      notes: notes.trim() || null,
+      category: profile, // free-ish; defaults to the profile until a category picker exists
       profile,
-      effort,
-      deadlineMs: deadlineToMs(deadline, pickedISO),
-      baseScore: baseScoreForEffort(effort),
-      urgencyMultiplier: preview.urgency,
-      decayRatePerDay: preview.decay,
+      effortMinutes,
+      deadline: deadlineToDate(deadline, pickedISO),
     })
     navigate('/tasks')
   }
-
-  const canSave = title.trim().length > 0
 
   if (step === 1) {
     return (
@@ -187,14 +182,14 @@ export function AddTaskScreen() {
 
       <SectionLabel className={styles.label}>Effort</SectionLabel>
       <div className={styles.effortRow}>
-        {EFFORTS.map((e) => (
+        {EFFORT_OPTIONS.map((o) => (
           <ChoiceChip
-            key={e}
-            selected={effort === e}
-            onClick={() => setEffort(e)}
+            key={o.minutes}
+            selected={effortMinutes === o.minutes}
+            onClick={() => setEffortMinutes(o.minutes)}
             className={styles.effortChip}
           >
-            {e}
+            {o.label}
           </ChoiceChip>
         ))}
       </div>
@@ -206,8 +201,8 @@ export function AddTaskScreen() {
           <div className={styles.previewBleed}>−{preview.decay}/day after</div>
         </div>
         <div className={styles.previewSub}>
-          {effort} effort · urgency ×{preview.urgency.toFixed(1)} for a{' '}
-          {DEADLINE_PHRASE[deadline]} deadline
+          {EFFORT_OPTIONS.find((o) => o.minutes === effortMinutes)?.label} effort · urgency ×
+          {preview.urgency.toFixed(1)} for a {DEADLINE_PHRASE[deadline]} deadline
         </div>
       </Card>
     </Screen>

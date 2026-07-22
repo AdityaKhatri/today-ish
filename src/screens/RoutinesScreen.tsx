@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PlusIcon } from '@/components/icons'
 import { RoutineRow } from '@/components/domain/RoutineRow'
@@ -7,36 +7,37 @@ import { Screen } from '@/components/layout/Screen'
 import { Card } from '@/components/ui/Card'
 import { ProgressRing } from '@/components/ui/ProgressRing'
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
+import { useData } from '@/data/DataProvider'
 import { PROFILE_OPTIONS } from '@/lib/profileOptions'
-import type { RoutineStatusView } from '@/lib/views'
-import { MOCK_ROUTINES, filterByProfile } from '@/mock/fixtures'
+import { matchesProfile } from '@/lib/taskFilters'
+import { buildRoutineView, isRoutineDone, routineActiveOn } from '@/lib/views'
 import { useProfile } from '@/state/ProfileContext'
+import { useNow } from '@/state/useNow'
 import styles from './RoutinesScreen.module.css'
-
-/** Optimistic local toggle so the daily view feels live before Firestore lands. */
-function nextStatus(status: RoutineStatusView): RoutineStatusView {
-  return status === 'done' ? 'pending' : 'done'
-}
 
 export function RoutinesScreen() {
   const navigate = useNavigate()
   const { filter, setFilter } = useProfile()
-  const [overrides, setOverrides] = useState<Record<string, RoutineStatusView>>({})
+  const { routines, todayLogs, setRoutineDone } = useData()
+  const now = useNow()
 
-  const routines = useMemo(() => {
-    return filterByProfile(MOCK_ROUTINES, filter).map((r) => ({
-      ...r,
-      status: overrides[r.id] ?? r.status,
-      sub: (overrides[r.id] ?? r.status) === 'done' ? 'done today' : r.sub,
+  const { rows, doneCount, total, maxStreak } = useMemo(() => {
+    const nowDate = new Date(now)
+    const dow = nowDate.getDay()
+    const active = routines.filter(
+      (r) => matchesProfile(r.profile, filter) && routineActiveOn(r, dow),
+    )
+    const built = active.map((r) => ({
+      routine: r,
+      view: buildRoutineView(r, todayLogs[r.id], nowDate),
     }))
-  }, [filter, overrides])
-
-  const doneCount = routines.filter((r) => r.status === 'done').length
-
-  const toggle = (id: string, current: RoutineStatusView) => {
-    // Instant-optimistic: flip immediately. Firestore write + streak txn later.
-    setOverrides((o) => ({ ...o, [id]: nextStatus(current) }))
-  }
+    return {
+      rows: built,
+      doneCount: built.filter((b) => b.view.status === 'done').length,
+      total: built.length,
+      maxStreak: active.reduce((m, r) => Math.max(m, r.currentStreak), 0),
+    }
+  }, [routines, todayLogs, filter, now])
 
   return (
     <Screen footer={<BottomNav />} contentClassName={styles.content}>
@@ -56,21 +57,27 @@ export function RoutinesScreen() {
       </div>
 
       <Card className={styles.summary}>
-        <ProgressRing value={doneCount} max={routines.length} size={56} />
+        <ProgressRing value={doneCount} max={total} size={56} />
         <div>
           <div className={styles.summaryNum}>
-            {doneCount} / {routines.length}
+            {doneCount} / {total}
           </div>
-          <div className={styles.summarySub}>12-day streak · 86% hit rate</div>
+          <div className={styles.summarySub}>
+            {maxStreak > 0 ? `${maxStreak}-day streak` : 'No streak yet'}
+          </div>
         </div>
       </Card>
 
-      {routines.length > 0 ? (
-        routines.map((r) => (
-          <RoutineRow key={r.id} routine={r} onToggle={() => toggle(r.id, r.status)} />
+      {rows.length > 0 ? (
+        rows.map(({ routine, view }) => (
+          <RoutineRow
+            key={routine.id}
+            routine={view}
+            onToggle={() => setRoutineDone(routine, !isRoutineDone(routine, todayLogs[routine.id]))}
+          />
         ))
       ) : (
-        <div className={styles.empty}>No routines for this profile yet.</div>
+        <div className={styles.empty}>No routines for today in this profile.</div>
       )}
     </Screen>
   )
