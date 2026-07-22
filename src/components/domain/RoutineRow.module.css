@@ -1,0 +1,61 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 15px 16px;
+  margin-bottom: 10px;
+}
+
+.mark {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.done {
+  background: var(--color-green);
+  color: #fff;
+}
+
+.pending {
+  border: 1.5px solid var(--color-text);
+}
+
+.missed {
+  border: 1.5px dashed var(--color-dash);
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.titleDone {
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+
+.titleMissed {
+  color: var(--color-text-faint);
+}
+
+.sub {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}

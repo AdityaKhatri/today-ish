@@ -1,0 +1,67 @@
+.card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 15px 16px;
+  margin-bottom: 10px;
+}
+
+.card:active {
+  transform: scale(0.995);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.titleWrap {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scoreWrap {
+  text-align: right;
+  flex: none;
+}
+
+.score {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.pos {
+  color: var(--color-green);
+}
+
+.neg {
+  color: var(--color-red);
+}
+
+.bleed {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-red);
+}
+
+.meta {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 3px;
+}

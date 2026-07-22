@@ -1,0 +1,32 @@
+# Design handoff (reference only — not part of the app)
+design_handoff_today_ish/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Dependencies & build output
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Environment (never commit real Firebase config / secrets)
+.env
+.env.local
+.env.*.local
+
+# Firebase
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+
+# Editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.sw?

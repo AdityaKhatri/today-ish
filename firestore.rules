@@ -1,0 +1,22 @@
+rules_version = '2';
+
+// =============================================================================
+// ⚠️  PLACEHOLDER — REPLACE WITH THE PROJECT'S ACTUAL DEPLOYED RULES.
+//
+// The real security rules were authored and deployed out-of-band (they enforce
+// the allowlist check for every /users/{uid}/** path and restrict each user to
+// reading only their own /allowlist/{email} entry). Paste them here so the repo
+// is the source of truth and `firebase deploy --only firestore:rules` matches
+// what's live.
+//
+// Until then this stand-in DENIES EVERYTHING so an accidental deploy can't open
+// the database up.
+// =============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

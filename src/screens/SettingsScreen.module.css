@@ -1,0 +1,95 @@
+.content {
+  padding: 24px 20px 32px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--color-coral);
+  margin-bottom: 26px;
+}
+
+.sectionLabel {
+  margin-bottom: 10px;
+}
+
+.listCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 6px 16px;
+  margin-bottom: 26px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+}
+
+.rowBordered {
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.rowText {
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.rowValue {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.actionCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  margin-bottom: 26px;
+}
+
+.actionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.actionSub {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 3px;
+}
+
+.turnOn {
+  background: var(--color-coral);
+  color: var(--color-coral-ink);
+  border: none;
+  border-radius: 14px;
+  padding: 11px 16px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.showMe {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-green);
+  background: none;
+  border: none;
+}
+
+.signOut {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-red);
+  padding: 14px;
+  background: none;
+  border: none;
+  width: 100%;
+}

@@ -1,0 +1,29 @@
+.nav {
+  display: flex;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+  padding: 14px 8px calc(18px + var(--safe-bottom));
+}
+
+.item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-text-muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  text-decoration: none;
+  background: none;
+  border: none;
+}
+
+.active {
+  color: var(--color-coral);
+  font-weight: 700;
+}
+
+.label {
+  line-height: 1;
+}

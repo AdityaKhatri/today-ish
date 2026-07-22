@@ -1,0 +1,32 @@
+.track {
+  display: flex;
+  background: var(--color-bg-end);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+}
+
+.seg {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  border-radius: var(--radius-chip);
+  background: none;
+  border: none;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.large .seg {
+  padding: 9px 0;
+  font-size: 13px;
+}
+
+.selected {
+  background: var(--color-coral);
+  color: var(--color-coral-ink);
+  font-weight: 700;
+}

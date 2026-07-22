@@ -1,0 +1,142 @@
+.content {
+  padding: calc(16px + var(--safe-top)) 18px 8px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.cancel {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+}
+
+.step {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.titleInput {
+  border: none;
+  background: transparent;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--color-text);
+  resize: none;
+  outline: none;
+  min-height: 84px;
+  width: 100%;
+}
+
+.notesInput {
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  color: var(--color-text);
+  resize: none;
+  outline: none;
+  min-height: 70px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.label {
+  margin-bottom: 10px;
+}
+
+.deadlineGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.effortRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.effortRow > * {
+  flex: 1;
+}
+
+.effortChip {
+  padding: 10px 4px;
+  font-size: 13px;
+}
+
+.profileRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.profileRow > * {
+  flex: 1;
+}
+
+.dateInput {
+  margin-bottom: 22px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.preview {
+  margin-bottom: 6px;
+}
+
+.previewRow {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.previewPeak {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-green);
+}
+
+.previewBleed {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-red);
+}
+
+.previewSub {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 8px;
+}
+
+.footerPad {
+  padding: 12px 18px calc(18px + var(--safe-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.saveNow {
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  background: none;
+  border: none;
+  padding: 10px;
+}

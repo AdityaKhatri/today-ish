@@ -1,0 +1,130 @@
+.content {
+  padding: calc(16px + var(--safe-top)) 18px 8px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.cancel {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+}
+
+.headTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.save {
+  font-size: 14px;
+  color: var(--color-green);
+  font-weight: 700;
+  background: none;
+  border: none;
+}
+
+.save:disabled {
+  opacity: 0.4;
+}
+
+.titleInput {
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  background: transparent;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text);
+  padding: 8px 0;
+  margin-bottom: 16px;
+  outline: none;
+  width: 100%;
+}
+
+.label {
+  margin-bottom: 8px;
+}
+
+.windowGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.windowChip {
+  padding: 10px;
+  font-size: 13px;
+}
+
+.section {
+  margin-bottom: 16px;
+}
+
+.days {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.day {
+  flex: 1;
+  aspect-ratio: 1;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12.5px;
+  font-weight: 700;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.dayActive {
+  background: var(--color-coral);
+  color: var(--color-coral-ink);
+  border-color: var(--color-coral);
+}
+
+.timeRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.timeInput {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.reminder {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+
+.reminderLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.footerPad {
+  padding: 12px 18px calc(18px + var(--safe-bottom));
+}

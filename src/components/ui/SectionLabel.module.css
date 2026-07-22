@@ -1,0 +1,11 @@
+.label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.small {
+  font-size: 11px;
+}

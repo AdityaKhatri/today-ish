@@ -1,0 +1,21 @@
+.fab {
+  position: absolute;
+  right: 18px;
+  bottom: calc(var(--nav-height) + 20px + var(--safe-bottom));
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: var(--color-coral);
+  box-shadow: var(--shadow-fab);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-coral-ink);
+}
+
+/* AI is deferred → the FAB is visibly disabled for this build. */
+.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}

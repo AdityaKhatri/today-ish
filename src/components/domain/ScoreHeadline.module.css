@@ -1,0 +1,47 @@
+.wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+}
+
+.potential {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--color-green);
+  line-height: 1;
+}
+
+.potentialCaption {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 5px;
+}
+
+.bleedWrap {
+  padding-bottom: 4px;
+}
+
+.bleed {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-red);
+}
+
+.bleedCaption {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+/* compact variant (Tasks header) */
+.compact {
+  align-items: baseline;
+  gap: 12px;
+}
+
+.compact .potential {
+  font-size: 26px;
+}
+
+.compact .bleed {
+  font-size: 13px;
+}

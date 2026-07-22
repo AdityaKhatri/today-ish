@@ -1,0 +1,54 @@
+/* ==========================================================================
+   Today-ish — "Nautilus" design tokens (Ledger Tide–derived)
+   Source of truth: design_handoff_today_ish/Today-ish.dc.html + README.md
+   ========================================================================== */
+
+:root {
+  /* --- Backgrounds --------------------------------------------------------- */
+  --bg-gradient: linear-gradient(160deg, #dceee9 0%, #f3e9e5 45%, #fbeadf 100%);
+  --color-bg-end: #fbeadf; /* warm cream — segmented-track / chip fill    */
+  --color-surface: #ffffff; /* cards                                        */
+  --color-surface-warm: #fff6f0; /* inner warm surface (icon chips, app pane)    */
+  --color-surface-tint: #fff1e8; /* logo tile tint                               */
+
+  /* --- Borders / dividers -------------------------------------------------- */
+  --color-border: #f0dfd3; /* hairline card border                         */
+  --color-divider: #eef1f2; /* faint list divider inside cards              */
+
+  /* --- Text ---------------------------------------------------------------- */
+  --color-text: #2b3a42; /* primary dark slate                           */
+  --color-text-muted: #5d717a; /* secondary slate-gray                         */
+  --color-text-faint: #9aa6ab; /* missed-routine title                         */
+
+  /* --- Accents ------------------------------------------------------------- */
+  --color-coral: #ff8b7b; /* PRIMARY: buttons, FAB, active nav, selected  */
+  --color-coral-ink: #2b3a42; /* text/icons ON coral (NOT white)              */
+  --color-wordmark: #e86f53; /* wordmark + links                             */
+  --color-turquoise: #2fb6a8; /* turquoise accent                             */
+
+  /* --- Semantic (functional only) ------------------------------------------ */
+  --color-green: #3b8577; /* healthy / potential                          */
+  --color-red: #c6553d; /* bleeding / overdue                           */
+  --color-amber: #d4a039; /* decaying soon                                */
+  --color-dash: #b7c0c4; /* missed-routine dashed ring                   */
+
+  /* --- Radii --------------------------------------------------------------- */
+  --radius-chip: 12px;
+  --radius-sm: 14px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-round: 50%;
+
+  /* --- Shadows ------------------------------------------------------------- */
+  --shadow-card: 0 20px 40px -22px rgba(34, 48, 58, 0.25);
+  --shadow-fab: 0 10px 22px -6px rgba(255, 139, 123, 0.5);
+
+  /* --- Type ---------------------------------------------------------------- */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+
+  /* --- Layout -------------------------------------------------------------- */
+  --app-max-width: 480px; /* mobile-first; caps width on desktop web      */
+  --nav-height: 64px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}

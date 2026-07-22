@@ -1,0 +1,65 @@
+.screen {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: calc(32px + var(--safe-top)) 32px calc(32px + var(--safe-bottom));
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 10px;
+}
+
+.sub {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: 28px;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  padding: 16px 18px;
+}
+
+.stepIcon {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 16px;
+  background: var(--color-surface-warm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-coral);
+}
+
+.stepIconDone {
+  color: var(--color-green);
+}
+
+.stepText {
+  font-size: 14px;
+  color: var(--color-text);
+}

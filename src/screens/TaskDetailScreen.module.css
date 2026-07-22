@@ -1,0 +1,111 @@
+.content {
+  padding: calc(16px + var(--safe-top)) 18px 8px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.back {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+}
+
+.delete {
+  font-size: 13px;
+  color: var(--color-red);
+  font-weight: 600;
+  background: none;
+  border: none;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 14px;
+}
+
+.scoreCard {
+  margin-bottom: 16px;
+}
+
+.scoreRow {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.score {
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.pos {
+  color: var(--color-green);
+}
+
+.neg {
+  color: var(--color-red);
+}
+
+.bleed {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-red);
+}
+
+.scoreNote {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 6px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.rowLabel {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.rowValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.notesBlock {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.notesLabel {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.notesText {
+  font-size: 14px;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.footerPad {
+  padding: 12px 18px calc(18px + var(--safe-bottom));
+}
+
+.notFound {
+  padding: 40px 18px;
+  color: var(--color-text-muted);
+}
