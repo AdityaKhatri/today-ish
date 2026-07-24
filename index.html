@@ -19,6 +19,64 @@
     <title>Today-ish</title>
   </head>
   <body>
+    <style>
+      #boot-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(160deg, #dceee9 0%, #f3e9e5 45%, #fbeadf 100%);
+        transition: opacity 0.35s ease;
+      }
+      #boot-splash svg {
+        width: 76px;
+        height: 76px;
+        transform-origin: 50% 50%;
+        animation:
+          boot-spin 2.2s linear infinite,
+          boot-breathe 1.6s ease-in-out infinite;
+      }
+      @keyframes boot-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes boot-breathe {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #boot-splash svg {
+          animation: boot-breathe 2.4s ease-in-out infinite;
+        }
+      }
+    </style>
+    <!-- Pre-React splash — visible instantly while the bundle loads, removed on mount -->
+    <div id="boot-splash" aria-hidden="true">
+      <svg viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="bootGrad" x1="10%" y1="5%" x2="75%" y2="60%">
+            <stop offset="0%" stop-color="#FFB6A3" />
+            <stop offset="100%" stop-color="#2FB6A8" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M 3.3 2.9 L 2.0 8.6 L 2.1 14.2 L 3.4 19.1 L 5.6 23.4 L 8.5 26.7 L 11.9 29.1 L 15.5 30.6 L 19.0 31.1 L 22.4 30.9 L 25.3 29.9 L 27.8 28.4 L 29.7 26.5 L 31.1 24.4 L 31.8 22.2 L 32.0 20.0 L 31.7 18.0 L 31.0 16.2 L 30.0 14.8 L 28.8 13.7 L 27.4 13.0 L 26.1 12.6 L 24.8 12.6 L 23.5 12.8 L 22.5 13.3 L 21.7 14.0 L 21.1 14.7 L 20.7 15.6 L 20.5 16.4 L 20.5 17.2 L 20.7 17.9 L 21.1 18.6 L 21.5 19.0 L 22.0 19.4 L 22.5 19.6 L 23.0 19.6 L 23.5 19.6 L 24.0 19.5 L 24.3 19.2 L 24.6 18.9 L 24.8 18.6 L 24.9 18.3 L 24.9 18.0 L 24.8 17.7 L 24.6 17.2 L 24.0 16.9 L 23.5 17.1 L 23.2 17.5 L 23.3 17.8 L 23.6 18.0"
+          stroke="url(#bootGrad)"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          fill="none"
+        />
+      </svg>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

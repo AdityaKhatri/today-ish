@@ -5,9 +5,11 @@ import { App } from './App'
 import { AuthProvider } from '@/auth/AuthProvider'
 import { ProfileProvider } from '@/state/ProfileContext'
 import { initViewportHeight } from '@/lib/viewport'
+import { setupPWA } from './pwa'
 import './styles/global.css'
 
 initViewportHeight()
+setupPWA()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -1,8 +1,5 @@
 .content {
   padding: calc(16px + var(--safe-top)) 18px 8px;
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
 }
 
 .header {

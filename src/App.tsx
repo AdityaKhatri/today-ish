@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { AppRoutes } from '@/app/AppRoutes'
 import { Splash } from '@/components/Splash'
 import { DataProvider } from '@/data/DataProvider'
@@ -12,6 +13,15 @@ import { useAuth } from '@/auth/useAuth'
  */
 export function App() {
   const { status } = useAuth()
+
+  // Fade out the pre-React boot splash once the app has mounted.
+  useEffect(() => {
+    const el = document.getElementById('boot-splash')
+    if (!el) return
+    el.style.opacity = '0'
+    const t = window.setTimeout(() => el.remove(), 400)
+    return () => window.clearTimeout(t)
+  }, [])
 
   if (status === 'loading' || status === 'checking') return <Splash />
   if (status === 'signedOut') return <SignInScreen />
