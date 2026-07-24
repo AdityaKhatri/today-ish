@@ -73,30 +73,29 @@ pnpm preview    # serve the production build (service worker active here)
 
 ## Deploy
 
+The app is hosted on **GitHub Pages at `today-ish.com`** via GitHub Actions
+(`.github/workflows/deploy.yml`) on every push to `main`. Firebase is **not** used
+for hosting. Full walkthrough (Pages source, repo variables, DNS, custom domain,
+authorized domains): **[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)**.
+
+In short: set the six `VITE_FIREBASE_*` repo **Variables**, point DNS at GitHub
+Pages, add `today-ish.com` to Firebase Auth authorized domains, and push.
+
+**Firestore rules** are managed separately with the Firebase CLI (not by CI):
+
 ```bash
-firebase use <your-project-id>
-
-# Security rules — see the note below before running this:
-firebase deploy --only firestore:rules
-
-# Hosting (builds to dist/):
-pnpm build
-firebase deploy --only hosting
+firebase deploy --only firestore:rules   # keep firestore.rules in sync
 ```
-
-> ⚠️ **`firestore.rules` at the repo root is a locked-down PLACEHOLDER.** The
-> real rules are already deployed on the project; paste them into that file
-> before ever running `firebase deploy --only firestore:rules`, or you'll
-> overwrite live rules with a deny-all.
 
 ---
 
 ## Project structure
 
 ```
-firestore.rules            # (placeholder) Firestore security rules
-firestore.indexes.json     # composite index defs (empty for now)
-firebase.json              # hosting (SPA rewrites) + firestore config
+firestore.rules            # deployed Firestore security rules
+firestore.indexes.json     # composite index defs (empty — all queries single-field)
+firebase.json              # firestore config (the hosting block is unused; app is on Pages)
+.github/workflows/         # deploy.yml — GitHub Pages CI/CD
 functions/                 # empty — reserved for the future Blaze build
 public/
   favicon.svg
