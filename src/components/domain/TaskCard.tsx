@@ -1,5 +1,6 @@
 import { UrgencyDot } from '@/components/ui/UrgencyDot'
 import { cn } from '@/lib/cn'
+import { SHOW_SCORES } from '@/lib/features'
 import type { TaskView } from '@/lib/views'
 import styles from './TaskCard.module.css'
 
@@ -17,12 +18,14 @@ export function TaskCard({ task, onClick }: { task: TaskView; onClick?: () => vo
           <UrgencyDot tier={task.tier} />
           <span className={styles.title}>{task.title}</span>
         </div>
-        <div className={styles.scoreWrap}>
-          <div className={cn(styles.score, positive ? styles.pos : styles.neg)}>
-            {scoreLabel(task.live)}
+        {SHOW_SCORES && (
+          <div className={styles.scoreWrap}>
+            <div className={cn(styles.score, positive ? styles.pos : styles.neg)}>
+              {scoreLabel(task.live)}
+            </div>
+            <div className={styles.bleed}>−{task.bleed}/day</div>
           </div>
-          <div className={styles.bleed}>−{task.bleed}/day</div>
-        </div>
+        )}
       </div>
       <div className={styles.meta}>{task.meta}</div>
     </button>

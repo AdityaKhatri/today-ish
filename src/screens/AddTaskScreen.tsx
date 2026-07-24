@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Screen } from '@/components/layout/Screen'
 import { Button } from '@/components/ui/Button'
@@ -6,6 +6,8 @@ import { Card } from '@/components/ui/Card'
 import { ChoiceChip } from '@/components/ui/ChoiceChip'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { useData } from '@/data/DataProvider'
+import { SHOW_SCORES } from '@/lib/features'
+import { localDateKey } from '@/lib/dates'
 import {
   EFFORT_OPTIONS,
   baseScoreForEffortMinutes,
@@ -52,13 +54,22 @@ export function AddTaskScreen() {
   const { activeProfile } = useProfile()
   const { createTask } = useData()
 
+  const titleRef = useRef<HTMLTextAreaElement>(null)
   const [step, setStep] = useState<1 | 2>(1)
   const [title, setTitle] = useState('')
   const [notes, setNotes] = useState('')
   const [profile, setProfile] = useState<Profile>(activeProfile)
   const [deadline, setDeadline] = useState<DeadlineChoice>('today')
-  const [pickedISO, setPickedISO] = useState('')
+  // Default to a real date so the picker is never blank when "Pick date" is chosen.
+  const [pickedISO, setPickedISO] = useState(() =>
+    localDateKey(new Date(Date.now() + 3 * 86_400_000)),
+  )
   const [effortMinutes, setEffortMinutes] = useState(30)
+
+  // Open the keyboard immediately on the "what needs doing?" field.
+  useEffect(() => {
+    if (step === 1) titleRef.current?.focus()
+  }, [step])
 
   const preview = useMemo(() => {
     const now = Date.now()
@@ -115,6 +126,7 @@ export function AddTaskScreen() {
           <div className={styles.step}>1 of 2</div>
         </div>
         <textarea
+          ref={titleRef}
           className={styles.titleInput}
           placeholder="What needs doing?"
           value={title}
@@ -194,17 +206,19 @@ export function AddTaskScreen() {
         ))}
       </div>
 
-      <Card className={styles.preview}>
-        <SectionLabel small>If done today</SectionLabel>
-        <div className={styles.previewRow} style={{ marginTop: 8 }}>
-          <div className={styles.previewPeak}>+{preview.peak}</div>
-          <div className={styles.previewBleed}>−{preview.decay}/day after</div>
-        </div>
-        <div className={styles.previewSub}>
-          {EFFORT_OPTIONS.find((o) => o.minutes === effortMinutes)?.label} effort · urgency ×
-          {preview.urgency.toFixed(1)} for a {DEADLINE_PHRASE[deadline]} deadline
-        </div>
-      </Card>
+      {SHOW_SCORES && (
+        <Card className={styles.preview}>
+          <SectionLabel small>If done today</SectionLabel>
+          <div className={styles.previewRow} style={{ marginTop: 8 }}>
+            <div className={styles.previewPeak}>+{preview.peak}</div>
+            <div className={styles.previewBleed}>−{preview.decay}/day after</div>
+          </div>
+          <div className={styles.previewSub}>
+            {EFFORT_OPTIONS.find((o) => o.minutes === effortMinutes)?.label} effort · urgency ×
+            {preview.urgency.toFixed(1)} for a {DEADLINE_PHRASE[deadline]} deadline
+          </div>
+        </Card>
+      )}
     </Screen>
   )
 }

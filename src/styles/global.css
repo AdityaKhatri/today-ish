@@ -5,10 +5,11 @@
 *::before,
 *::after {
   box-sizing: border-box;
+  margin: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 * {
-  margin: 0;
   font-family: var(--font-sans);
 }
 
@@ -18,14 +19,30 @@ body,
   height: 100%;
 }
 
+/*
+ * Lock the app to the viewport and let inner containers do the scrolling.
+ * This is what keeps iOS from document-scrolling (which fights the standalone
+ * chrome) and prevents accidental horizontal scroll.
+ */
+#root {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: var(--app-height, 100svh);
+}
+@media (display-mode: standalone) {
+  #root {
+    height: var(--app-height, 100dvh);
+  }
+}
+
 body {
   background: var(--bg-gradient);
   background-attachment: fixed;
   color: var(--color-text);
+  font-size: 16px; /* ≥16px baseline so iOS doesn't zoom when a field is focused */
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  /* prevent iOS rubber-band showing white behind fixed gradient */
-  min-height: 100dvh;
 }
 
 ::selection {
@@ -42,7 +59,8 @@ button {
 }
 
 input,
-textarea {
+textarea,
+select {
   font-family: inherit;
   color: inherit;
 }
@@ -52,7 +70,6 @@ a {
   text-decoration: none;
 }
 
-/* Buttons/links shouldn't show the tap highlight on mobile */
 button,
 a,
 [role='button'] {

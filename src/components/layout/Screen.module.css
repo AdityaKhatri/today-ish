@@ -1,7 +1,8 @@
 .shell {
   max-width: var(--app-max-width);
+  width: 100%;
   margin: 0 auto;
-  min-height: 100dvh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -11,7 +12,9 @@
 .scroll {
   flex: 1 1 auto;
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .footer {

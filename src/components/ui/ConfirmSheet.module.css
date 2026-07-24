@@ -1,0 +1,40 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(34, 48, 58, 0.45);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+  padding-bottom: calc(16px + var(--safe-bottom));
+}
+
+.sheet {
+  width: 100%;
+  max-width: var(--app-max-width);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 22px 20px 16px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+
+.message {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

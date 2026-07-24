@@ -7,6 +7,7 @@ import { Screen } from '@/components/layout/Screen'
 import { Button } from '@/components/ui/Button'
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import { useData } from '@/data/DataProvider'
+import { SHOW_SCORES } from '@/lib/features'
 import { PROFILE_OPTIONS } from '@/lib/profileOptions'
 import type { UrgencyTier } from '@/lib/scoring'
 import { matchesProfile } from '@/lib/taskFilters'
@@ -49,9 +50,11 @@ export function TasksScreen() {
       <div className={styles.switcher}>
         <SegmentedControl options={PROFILE_OPTIONS} value={filter} onChange={setFilter} large />
       </div>
-      <div className={styles.score}>
-        <ScoreHeadline potential={sumLive(views)} bleed={sumBleed(views)} compact />
-      </div>
+      {SHOW_SCORES && (
+        <div className={styles.score}>
+          <ScoreHeadline potential={sumLive(views)} bleed={sumBleed(views)} compact />
+        </div>
+      )}
 
       {views.length > 0 ? (
         views.map((t) => (

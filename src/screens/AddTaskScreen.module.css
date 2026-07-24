@@ -40,7 +40,7 @@
 .notesInput {
   border: none;
   background: transparent;
-  font-size: 15px;
+  font-size: 16px;
   color: var(--color-text);
   resize: none;
   outline: none;
@@ -88,12 +88,15 @@
 .dateInput {
   margin-bottom: 22px;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   padding: 12px 14px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: 16px;
   background: var(--color-surface);
   color: var(--color-text);
+  color-scheme: light;
 }
 
 .preview {

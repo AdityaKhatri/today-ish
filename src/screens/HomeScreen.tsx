@@ -2,8 +2,6 @@ import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PlusIcon } from '@/components/icons'
 import { Wordmark } from '@/components/Logo'
-import { AskAiFab } from '@/components/domain/AskAiFab'
-import { MorningBriefCard } from '@/components/domain/MorningBriefCard'
 import { ScoreHeadline } from '@/components/domain/ScoreHeadline'
 import { TaskCard } from '@/components/domain/TaskCard'
 import { BottomNav } from '@/components/layout/BottomNav'
@@ -14,6 +12,7 @@ import { SectionLabel } from '@/components/ui/SectionLabel'
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import { useAuth } from '@/auth/useAuth'
 import { useData } from '@/data/DataProvider'
+import { SHOW_SCORES } from '@/lib/features'
 import { formatLongDate } from '@/lib/dates'
 import { PROFILE_OPTIONS } from '@/lib/profileOptions'
 import type { UrgencyTier } from '@/lib/scoring'
@@ -55,7 +54,7 @@ export function HomeScreen() {
   }, [routines, todayLogs, filter, now])
 
   return (
-    <Screen footer={<BottomNav />} overlay={<AskAiFab />} contentClassName={styles.content}>
+    <Screen footer={<BottomNav />} contentClassName={styles.content}>
       <div className={styles.topbar}>
         <Wordmark size={16} />
         <OfflineBadge />
@@ -71,11 +70,11 @@ export function HomeScreen() {
         </button>
       </div>
 
-      <MorningBriefCard />
-
-      <div className={styles.score}>
-        <ScoreHeadline potential={sumLive(views)} bleed={sumBleed(views)} />
-      </div>
+      {SHOW_SCORES && (
+        <div className={styles.score}>
+          <ScoreHeadline potential={sumLive(views)} bleed={sumBleed(views)} />
+        </div>
+      )}
 
       <div className={styles.switcher}>
         <SegmentedControl options={PROFILE_OPTIONS} value={filter} onChange={setFilter} />

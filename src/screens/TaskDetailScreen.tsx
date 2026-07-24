@@ -1,10 +1,13 @@
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CheckIcon } from '@/components/icons'
 import { Screen } from '@/components/layout/Screen'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
+import { ConfirmSheet } from '@/components/ui/ConfirmSheet'
 import { useData } from '@/data/DataProvider'
 import { cn } from '@/lib/cn'
+import { SHOW_SCORES } from '@/lib/features'
 import { relativeDeadlineLabel } from '@/lib/dates'
 import { effortLabel } from '@/lib/scoring'
 import type { UrgencyTier } from '@/lib/scoring'
@@ -23,6 +26,7 @@ export function TaskDetailScreen() {
   const { id } = useParams()
   const { tasks, completeTask, deleteTask } = useData()
   const now = useNow() // keep the live score fresh
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   const task = tasks.find((t) => t.id === id)
 
@@ -54,7 +58,7 @@ export function TaskDetailScreen() {
   }
 
   function handleDelete() {
-    if (!window.confirm(`Delete “${task!.title}”?`)) return
+    setConfirmingDelete(false)
     void deleteTask(task!.id)
     navigate('/tasks')
   }
@@ -62,6 +66,17 @@ export function TaskDetailScreen() {
   return (
     <Screen
       contentClassName={styles.content}
+      overlay={
+        <ConfirmSheet
+          open={confirmingDelete}
+          title="Delete this task?"
+          message={`“${task.title}” will be removed. This can’t be undone.`}
+          confirmLabel="Delete"
+          destructive
+          onConfirm={handleDelete}
+          onCancel={() => setConfirmingDelete(false)}
+        />
+      }
       footer={
         <div className={styles.footerPad}>
           <Button fullWidth onClick={handleComplete}>
@@ -75,22 +90,24 @@ export function TaskDetailScreen() {
         <button className={styles.back} onClick={() => navigate('/tasks')}>
           ← Tasks
         </button>
-        <button className={styles.delete} onClick={handleDelete}>
+        <button className={styles.delete} onClick={() => setConfirmingDelete(true)}>
           Delete
         </button>
       </div>
 
       <div className={styles.title}>{task.title}</div>
 
-      <Card className={styles.scoreCard}>
-        <div className={styles.scoreRow}>
-          <div className={cn(styles.score, positive ? styles.pos : styles.neg)}>
-            {positive ? `+${view.live}` : `−${Math.abs(view.live)}`}
+      {SHOW_SCORES && (
+        <Card className={styles.scoreCard}>
+          <div className={styles.scoreRow}>
+            <div className={cn(styles.score, positive ? styles.pos : styles.neg)}>
+              {positive ? `+${view.live}` : `−${Math.abs(view.live)}`}
+            </div>
+            <div className={styles.bleed}>−{view.bleed}/day</div>
           </div>
-          <div className={styles.bleed}>−{view.bleed}/day</div>
-        </div>
-        <div className={styles.scoreNote}>{SCORE_NOTE[view.tier]}</div>
-      </Card>
+          <div className={styles.scoreNote}>{SCORE_NOTE[view.tier]}</div>
+        </Card>
+      )}
 
       <div className={styles.row}>
         <div className={styles.rowLabel}>Deadline</div>

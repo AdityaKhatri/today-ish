@@ -1,8 +1,9 @@
 .nav {
   display: flex;
+  flex-shrink: 0;
   border-top: 1px solid var(--color-border);
   background: var(--color-surface);
-  padding: 14px 8px calc(18px + var(--safe-bottom));
+  padding: 14px 8px calc(14px + var(--safe-bottom));
 }
 
 .item {
