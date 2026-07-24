@@ -1,4 +1,4 @@
-# Deployment — GitHub Pages → today-ish.com
+# Deployment — GitHub Pages → app.today-ish.com
 
 The app deploys to **GitHub Pages** via GitHub Actions
 (`.github/workflows/deploy.yml`) on every push to `main`. Firebase is used only
@@ -34,36 +34,24 @@ deployed separately, see below).
 
 ---
 
-## 2. Custom domain — today-ish.com
+## 2. Custom domain — app.today-ish.com
 
 The domain is committed as `public/CNAME` (→ `dist/CNAME`), so Pages keeps the
 custom domain on every deploy. You still need to:
 
 **a) Set it in GitHub.** Repo → **Settings → Pages → Custom domain** →
-`today-ish.com` → Save. Tick **Enforce HTTPS** once the cert is issued (can take
-a few minutes to an hour after DNS resolves).
+`app.today-ish.com` → Save. Tick **Enforce HTTPS** once the cert is issued (can
+take a few minutes to an hour after DNS resolves).
 
-**b) Configure DNS** at your registrar for the apex domain:
+**b) Configure DNS** at your registrar — a single CNAME record for the subdomain:
 
 ```
-# A records (IPv4)
-@   A   185.199.108.153
-@   A   185.199.109.153
-@   A   185.199.110.153
-@   A   185.199.111.153
-
-# AAAA records (IPv6, recommended)
-@   AAAA 2606:50c0:8000::153
-@   AAAA 2606:50c0:8001::153
-@   AAAA 2606:50c0:8002::153
-@   AAAA 2606:50c0:8003::153
-
-# Optional: www → your Pages site
-www CNAME <your-github-username>.github.io.
+app   CNAME   <your-github-username>.github.io.
 ```
 
-DNS propagation + cert issuance can take up to ~24h the first time (usually much
-less).
+Subdomains use a CNAME (the apex `A`/`AAAA` records are only needed if you also
+serve the root `today-ish.com`). DNS propagation + cert issuance can take up to
+~24h the first time, usually much less.
 
 ---
 
@@ -72,8 +60,8 @@ less).
 Google sign-in will fail on the live site until the domain is authorized:
 
 Firebase console → **Authentication → Settings → Authorized domains → Add
-domain** → add **`today-ish.com`** (and `www.today-ish.com` if you use www).
-`localhost` is already there for local dev.
+domain** → add **`app.today-ish.com`**. `localhost` is already there for local
+dev.
 
 ---
 

@@ -73,13 +73,14 @@ pnpm preview    # serve the production build (service worker active here)
 
 ## Deploy
 
-The app is hosted on **GitHub Pages at `today-ish.com`** via GitHub Actions
+The app is hosted on **GitHub Pages at `app.today-ish.com`** via GitHub Actions
 (`.github/workflows/deploy.yml`) on every push to `main`. Firebase is **not** used
 for hosting. Full walkthrough (Pages source, repo variables, DNS, custom domain,
 authorized domains): **[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)**.
 
-In short: set the six `VITE_FIREBASE_*` repo **Variables**, point DNS at GitHub
-Pages, add `today-ish.com` to Firebase Auth authorized domains, and push.
+In short: set the six `VITE_FIREBASE_*` repo **Variables**, add a DNS CNAME
+`app → <username>.github.io`, add `app.today-ish.com` to Firebase Auth authorized
+domains, and push.
 
 **Firestore rules** are managed separately with the Firebase CLI (not by CI):
 
