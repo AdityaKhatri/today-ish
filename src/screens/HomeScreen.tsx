@@ -36,7 +36,7 @@ export function HomeScreen() {
   const views = useMemo(
     () =>
       tasks
-        .filter((t) => matchesProfile(t.profile, filter))
+        .filter((t) => t.status === 'active' && matchesProfile(t.profile, filter))
         .map((t) => buildTaskView(t, now))
         .sort((a, b) => TIER_RANK[a.tier] - TIER_RANK[b.tier] || b.bleed - a.bleed),
     [tasks, filter, now],

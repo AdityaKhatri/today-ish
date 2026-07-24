@@ -65,3 +65,20 @@
   color: var(--color-text-muted);
   margin-top: 3px;
 }
+
+.done {
+  opacity: 0.6;
+}
+
+.doneTitle {
+  text-decoration: line-through;
+}
+
+.check {
+  width: 8px;
+  flex: none;
+  color: var(--color-green);
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1;
+}

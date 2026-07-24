@@ -137,6 +137,17 @@ export const AddSquareIcon = (p: IconProps) => (
   </svg>
 )
 
+export const FilterIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path
+      d="M4 6H20M7 12H17M10 18H14"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+    />
+  </svg>
+)
+
 export const SendIcon = (p: IconProps) => (
   <svg {...base(p)}>
     <path

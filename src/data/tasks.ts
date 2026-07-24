@@ -3,10 +3,8 @@ import {
   addDoc,
   deleteDoc,
   onSnapshot,
-  query,
   serverTimestamp,
   updateDoc,
-  where,
 } from 'firebase/firestore'
 import type { FirestoreError } from 'firebase/firestore'
 import { tasksCol, taskDocRef } from './paths'
@@ -28,15 +26,18 @@ export interface NewTaskInput {
   deadline: Date | null
 }
 
-/** Live subscription to the user's ACTIVE tasks (completed are kept as history). */
+/**
+ * Live subscription to ALL of the user's tasks (active + completed). Screens
+ * filter by status locally — Home shows only active; Tasks can show completed
+ * via its Status filter.
+ */
 export function subscribeTasks(
   uid: string,
   cb: (tasks: Task[]) => void,
   onError?: (e: FirestoreError) => void,
 ): () => void {
-  const q = query(tasksCol(uid), where('status', '==', 'active'))
   return onSnapshot(
-    q,
+    tasksCol(uid),
     (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Task, 'id'>) }))),
     onError,
   )

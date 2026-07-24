@@ -6,6 +6,7 @@
 :root {
   /* --- Backgrounds --------------------------------------------------------- */
   --bg-gradient: linear-gradient(160deg, #dceee9 0%, #f3e9e5 45%, #fbeadf 100%);
+  --color-bg-top: #dceee9; /* gradient's top color — also the iOS status-bar tint */
   --color-bg-end: #fbeadf; /* warm cream — segmented-track / chip fill    */
   --color-surface: #ffffff; /* cards                                        */
   --color-surface-warm: #fff6f0; /* inner warm surface (icon chips, app pane)    */

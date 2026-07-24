@@ -19,6 +19,12 @@ body,
   height: 100%;
 }
 
+/* Solid color (matches the gradient's top) so iOS tints the standalone status
+   bar with it instead of falling back to white. */
+html {
+  background-color: var(--color-bg-top);
+}
+
 /*
  * Lock the app to the viewport and let inner containers do the scrolling.
  * This is what keeps iOS from document-scrolling (which fights the standalone
@@ -37,7 +43,8 @@ body,
 }
 
 body {
-  background: var(--bg-gradient);
+  background-image: var(--bg-gradient);
+  background-color: var(--color-bg-top);
   background-attachment: fixed;
   color: var(--color-text);
   font-size: 16px; /* ≥16px baseline so iOS doesn't zoom when a field is focused */
