@@ -6,7 +6,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .back {
@@ -16,93 +16,75 @@
   border: none;
 }
 
-.delete {
-  font-size: 13px;
-  color: var(--color-red);
-  font-weight: 600;
+.save {
+  font-size: 14px;
+  color: var(--color-green);
+  font-weight: 700;
   background: none;
   border: none;
 }
 
+.save:disabled {
+  opacity: 0.4;
+}
+
 .title {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  background: transparent;
   font-size: 22px;
   font-weight: 800;
   color: var(--color-text);
-  margin-bottom: 14px;
-}
-
-.scoreCard {
+  padding: 6px 0 10px;
   margin-bottom: 16px;
+  outline: none;
+  resize: none;
+  min-height: 36px;
 }
 
-.scoreRow {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
-}
-
-.score {
-  font-size: 30px;
-  font-weight: 800;
-}
-
-.pos {
-  color: var(--color-green);
-}
-
-.neg {
-  color: var(--color-red);
-}
-
-.bleed {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--color-red);
-}
-
-.scoreNote {
-  font-size: 12px;
-  color: var(--color-text-muted);
-  margin-top: 6px;
-}
-
-.row {
-  display: flex;
-  justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.rowLabel {
-  font-size: 13px;
-  color: var(--color-text-muted);
-}
-
-.rowValue {
-  font-size: 14px;
-  font-weight: 600;
+.notes {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: 16px;
   color: var(--color-text);
+  resize: none;
+  outline: none;
+  min-height: 60px;
+  margin-bottom: 18px;
 }
 
-.notesBlock {
-  padding: 12px 0;
-  border-bottom: 1px solid var(--color-border);
+.label {
+  margin-bottom: 10px;
 }
 
-.notesLabel {
-  font-size: 13px;
-  color: var(--color-text-muted);
-  margin-bottom: 6px;
-}
-
-.notesText {
-  font-size: 14px;
+.textInput {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  background: var(--color-surface);
   color: var(--color-text);
-  line-height: 1.5;
+  margin-bottom: 22px;
 }
 
 .footerPad {
   padding: 12px 18px calc(18px + var(--safe-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.deleteBtn {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-red);
+  background: none;
+  border: none;
+  padding: 10px;
 }
 
 .notFound {

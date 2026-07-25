@@ -42,6 +42,14 @@ html {
   }
 }
 
+/* Desktop: center the framed app on the gradient with breathing room. */
+@media (min-width: 900px) {
+  #root {
+    align-items: center;
+    padding: 24px;
+  }
+}
+
 body {
   background-image: var(--bg-gradient);
   background-color: var(--color-bg-top);

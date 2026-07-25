@@ -110,47 +110,55 @@ export function HomeScreen() {
         <SegmentedControl options={PROFILE_OPTIONS} value={filter} onChange={setFilter} />
       </div>
 
-      <SectionLabel className={styles.priorityLabel}>Tasks</SectionLabel>
-      {taskRows.length > 0 ? (
-        taskRows.map((r) => (
-          <TaskCard
-            key={r.task.id}
-            task={r.view}
-            done={r.done}
-            onToggleDone={() => void setTaskCompleted(r.task, !r.done)}
-            onClick={() => navigate(`/tasks/${r.task.id}`)}
-          />
-        ))
-      ) : (
-        <div className={styles.empty}>Nothing pressing. Enjoy the breathing room.</div>
-      )}
+      <div className={styles.columns}>
+        <section className={styles.tasksCol}>
+          <SectionLabel className={styles.priorityLabel}>Tasks</SectionLabel>
+          {taskRows.length > 0 ? (
+            taskRows.map((r) => (
+              <TaskCard
+                key={r.task.id}
+                task={r.view}
+                done={r.done}
+                onToggleDone={() => void setTaskCompleted(r.task, !r.done)}
+                onClick={() => navigate(`/tasks/${r.task.id}`)}
+              />
+            ))
+          ) : (
+            <div className={styles.empty}>Nothing pressing. Enjoy the breathing room.</div>
+          )}
+        </section>
 
-      <SectionLabel className={styles.routinesLabel}>Today&rsquo;s routines</SectionLabel>
-      <button className={styles.routineCard} onClick={() => navigate('/routines')}>
-        <ProgressRing value={doneCount} max={total} size={44} />
-        <div>
-          <div className={styles.summaryTitle}>
-            {doneCount} of {total} done
-          </div>
-          <div className={styles.summarySub}>
-            {maxStreak > 0 ? `${maxStreak}-day streak` : 'No streak yet'}
-          </div>
-        </div>
-      </button>
+        <section className={styles.routinesCol}>
+          <SectionLabel className={styles.routinesLabel}>Today&rsquo;s routines</SectionLabel>
+          <button className={styles.routineCard} onClick={() => navigate('/routines')}>
+            <ProgressRing value={doneCount} max={total} size={44} />
+            <div>
+              <div className={styles.summaryTitle}>
+                {doneCount} of {total} done
+              </div>
+              <div className={styles.summarySub}>
+                {maxStreak > 0 ? `${maxStreak}-day streak` : 'No streak yet'}
+              </div>
+            </div>
+          </button>
 
-      {routineRows.length > 0 ? (
-        routineRows.map(({ routine, view }) => (
-          <RoutineRow
-            key={routine.id}
-            routine={view}
-            onToggle={() => {
-              void toggleRoutine(routine).catch((e) => console.error('[routine] toggle failed', e))
-            }}
-          />
-        ))
-      ) : (
-        <div className={styles.empty}>No routines for today.</div>
-      )}
+          {routineRows.length > 0 ? (
+            routineRows.map(({ routine, view }) => (
+              <RoutineRow
+                key={routine.id}
+                routine={view}
+                onToggle={() => {
+                  void toggleRoutine(routine).catch((e) =>
+                    console.error('[routine] toggle failed', e),
+                  )
+                }}
+              />
+            ))
+          ) : (
+            <div className={styles.empty}>No routines for today.</div>
+          )}
+        </section>
+      </div>
     </Screen>
   )
 }

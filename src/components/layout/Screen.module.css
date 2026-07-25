@@ -9,6 +9,13 @@
   padding-top: var(--safe-top);
 }
 
+/* Desktop: the screen fills the frame's content area (no mobile width cap). */
+@media (min-width: 900px) {
+  .shell {
+    max-width: none;
+  }
+}
+
 .scroll {
   flex: 1 1 auto;
   overflow-y: auto;

@@ -2,11 +2,29 @@
   padding: 24px 20px 16px;
 }
 
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
 .title {
   font-size: 16px;
   font-weight: 800;
   color: var(--color-coral);
-  margin-bottom: 18px;
+}
+
+.addBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  background: var(--color-coral);
+  color: var(--color-coral-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
 }
 
 .switcher {
@@ -17,13 +35,22 @@
   margin-bottom: 24px;
 }
 
-.addBar {
-  padding: 10px 16px 12px;
-}
-
 .empty {
   font-size: 14px;
   color: var(--color-text-muted);
   text-align: center;
   padding: 40px 0;
 }
+
+/* ── Desktop (≥900px): wider content, two-column card grid ── */
+@media (min-width: 900px) {
+  .content {
+    padding: 32px 40px;
+  }
+  .list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 12px;
+  }
+}
+

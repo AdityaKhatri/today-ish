@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { PlusIcon } from '@/components/icons'
 import { ScoreHeadline } from '@/components/domain/ScoreHeadline'
 import { TaskCard } from '@/components/domain/TaskCard'
 import { TaskFilters, DEFAULT_TASK_FILTERS } from '@/components/domain/TaskFilters'
 import type { TaskFilterState } from '@/components/domain/TaskFilters'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { Screen } from '@/components/layout/Screen'
-import { Button } from '@/components/ui/Button'
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import { useData } from '@/data/DataProvider'
 import { PROFILE_OPTIONS } from '@/lib/profileOptions'
@@ -66,20 +66,14 @@ export function TasksScreen() {
     [rows],
   )
 
-  const footer = (
-    <>
-      <div className={styles.addBar}>
-        <Button fullWidth onClick={() => navigate('/add')}>
-          + Add task
-        </Button>
-      </div>
-      <BottomNav />
-    </>
-  )
-
   return (
-    <Screen footer={footer} contentClassName={styles.content}>
-      <div className={styles.title}>Tasks</div>
+    <Screen footer={<BottomNav />} contentClassName={styles.content}>
+      <div className={styles.header}>
+        <div className={styles.title}>Tasks</div>
+        <button className={styles.addBtn} aria-label="Add task" onClick={() => navigate('/add')}>
+          <PlusIcon size={20} />
+        </button>
+      </div>
       <div className={styles.switcher}>
         <SegmentedControl options={PROFILE_OPTIONS} value={filter} onChange={setFilter} large />
       </div>
@@ -93,15 +87,17 @@ export function TasksScreen() {
       <TaskFilters value={filters} onChange={setFilters} categories={categories} />
 
       {rows.length > 0 ? (
-        rows.map((r) => (
-          <TaskCard
-            key={r.id}
-            task={r.view}
-            done={r.done}
-            onToggleDone={() => void setTaskCompleted(r.task, !r.done)}
-            onClick={() => navigate(`/tasks/${r.id}`)}
-          />
-        ))
+        <div className={styles.list}>
+          {rows.map((r) => (
+            <TaskCard
+              key={r.id}
+              task={r.view}
+              done={r.done}
+              onToggleDone={() => void setTaskCompleted(r.task, !r.done)}
+              onClick={() => navigate(`/tasks/${r.id}`)}
+            />
+          ))}
+        </div>
       ) : (
         <div className={styles.empty}>No tasks match these filters.</div>
       )}

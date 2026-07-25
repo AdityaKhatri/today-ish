@@ -68,6 +68,39 @@ export async function createTask(uid: string, input: NewTaskInput): Promise<void
   })
 }
 
+export interface UpdateTaskInput {
+  title: string
+  notes: string | null
+  category: string
+  profile: Profile
+  effortMinutes: number
+  deadline: Date | null
+}
+
+/** Edit a task. Re-derives the frozen scoring fields from the new effort/deadline. */
+export async function updateTask(
+  uid: string,
+  taskId: string,
+  input: UpdateTaskInput,
+): Promise<void> {
+  const now = Date.now()
+  const deadlineMs = input.deadline ? input.deadline.getTime() : null
+  const baseScore = baseScoreForEffortMinutes(input.effortMinutes)
+  const urgencyMultiplier = deadlineMs ? urgencyMultiplierForDeadline(now, deadlineMs) : 1.0
+  const decayRatePerDay = suggestedDecayRatePerDay(baseScore, urgencyMultiplier)
+  await updateDoc(taskDocRef(uid, taskId), {
+    title: input.title.trim(),
+    notes: input.notes?.trim() || null,
+    category: input.category,
+    profile: input.profile,
+    effortMinutes: input.effortMinutes,
+    deadline: deadlineMs ? Timestamp.fromMillis(deadlineMs) : null,
+    baseScore,
+    urgencyMultiplier,
+    decayRatePerDay,
+  })
+}
+
 /**
  * Toggle a task between completed and active.
  *

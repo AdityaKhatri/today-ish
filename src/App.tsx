@@ -4,6 +4,7 @@ import { AppRoutes } from '@/app/AppRoutes'
 import { ReminderRunner } from '@/components/ReminderRunner'
 import { Splash } from '@/components/Splash'
 import { UpdateSnackbar } from '@/components/UpdateSnackbar'
+import { AppFrame } from '@/components/layout/AppFrame'
 import { DataProvider } from '@/data/DataProvider'
 import { NotAuthorizedScreen } from '@/screens/NotAuthorizedScreen'
 import { SignInScreen } from '@/screens/SignInScreen'
@@ -34,7 +35,9 @@ export function App() {
     content = (
       <DataProvider>
         <ReminderRunner />
-        <AppRoutes />
+        <AppFrame>
+          <AppRoutes />
+        </AppFrame>
       </DataProvider>
     )
 

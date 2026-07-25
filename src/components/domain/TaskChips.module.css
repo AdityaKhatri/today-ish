@@ -1,0 +1,78 @@
+.label {
+  margin-bottom: 10px;
+}
+
+.row2 {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.row2 > * {
+  flex: 1;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.dateInput {
+  margin-bottom: 22px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  color-scheme: light;
+}
+
+.effortRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.effortRow > * {
+  flex: 1;
+}
+
+.effortChip {
+  padding: 10px 4px;
+  font-size: 13px;
+}
+
+.preview {
+  margin-bottom: 6px;
+}
+
+.previewRow {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.previewPeak {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-green);
+}
+
+.previewBleed {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-red);
+}
+
+.previewSub {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 8px;
+}

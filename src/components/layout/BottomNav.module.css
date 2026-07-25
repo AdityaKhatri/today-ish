@@ -6,6 +6,13 @@
   padding: 14px 8px calc(14px + var(--safe-bottom));
 }
 
+/* Desktop uses the sidebar rail instead. */
+@media (min-width: 900px) {
+  .nav {
+    display: none;
+  }
+}
+
 .item {
   flex: 1;
   display: flex;

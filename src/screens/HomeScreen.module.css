@@ -88,3 +88,27 @@
   color: var(--color-text-muted);
   padding: 8px 0 4px;
 }
+
+/* ── Desktop (≥900px): sidebar layout, two content columns ── */
+@media (min-width: 900px) {
+  .content {
+    padding: 32px 40px;
+  }
+  /* Logo lives in the sidebar on desktop. */
+  .topbar {
+    display: none;
+  }
+  .switcher {
+    max-width: 360px;
+  }
+  .columns {
+    display: grid;
+    grid-template-columns: 1.8fr 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+  .routinesLabel {
+    margin-top: 0;
+  }
+}
+

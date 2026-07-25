@@ -1,35 +1,35 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CheckIcon } from '@/components/icons'
+import { TaskChips } from '@/components/domain/TaskChips'
+import type { TaskChipsValue } from '@/components/domain/TaskChips'
 import { Screen } from '@/components/layout/Screen'
 import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
 import { ConfirmSheet } from '@/components/ui/ConfirmSheet'
+import { SectionLabel } from '@/components/ui/SectionLabel'
 import { useData } from '@/data/DataProvider'
-import { cn } from '@/lib/cn'
-import { relativeDeadlineLabel } from '@/lib/dates'
-import { effortLabel } from '@/lib/scoring'
-import type { UrgencyTier } from '@/lib/scoring'
-import { buildTaskView } from '@/lib/views'
-import { useShowScores } from '@/state/PreferencesContext'
-import { useNow } from '@/state/useNow'
+import { localDateKey } from '@/lib/dates'
+import { deadlineToDate, defaultPickedISO } from '@/lib/taskForm'
 import styles from './TaskDetailScreen.module.css'
-
-const SCORE_NOTE: Record<UrgencyTier, string> = {
-  red: 'Overdue — bleeding fast',
-  amber: 'Decaying soon',
-  green: 'Healthy — plenty of runway',
-}
 
 export function TaskDetailScreen() {
   const navigate = useNavigate()
   const { id } = useParams()
-  const { tasks, setTaskCompleted, deleteTask } = useData()
-  const now = useNow() // keep the live score fresh
-  const showScores = useShowScores()
-  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const { tasks, updateTask, setTaskCompleted, deleteTask } = useData()
 
   const task = tasks.find((t) => t.id === id)
+
+  const [title, setTitle] = useState(() => task?.title ?? '')
+  const [notes, setNotes] = useState(() => task?.notes ?? '')
+  const [category, setCategory] = useState(() => task?.category ?? '')
+  const [chips, setChips] = useState<TaskChipsValue>(() => ({
+    profile: task?.profile ?? 'personal',
+    deadline: 'pick',
+    pickedISO: task?.deadline ? localDateKey(task.deadline.toDate()) : defaultPickedISO(),
+    effortMinutes: task?.effortMinutes ?? 30,
+  }))
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const patch = (p: Partial<TaskChipsValue>) => setChips((c) => ({ ...c, ...p }))
 
   if (!task) {
     return (
@@ -44,17 +44,23 @@ export function TaskDetailScreen() {
     )
   }
 
-  const view = buildTaskView(task, now)
-  const positive = view.live >= 0
-  const deadlineRaw = task.deadline
-    ? relativeDeadlineLabel(task.deadline.toDate(), new Date(now)).replace(/^due /, '')
-    : 'no deadline'
-  const deadlineText = deadlineRaw.charAt(0).toUpperCase() + deadlineRaw.slice(1)
+  const isCompleted = task.status === 'completed'
+  const canSave = title.trim().length > 0
 
-  function handleComplete() {
-    // Instant-optimistic: the local cache reflects the write immediately, and
-    // completeTask captures scoreAtCompletion + a client Timestamp at the tap.
-    void setTaskCompleted(task!, true)
+  function handleSave() {
+    void updateTask(task!.id, {
+      title,
+      notes: notes.trim() || null,
+      category: category.trim() || chips.profile,
+      profile: chips.profile,
+      effortMinutes: chips.effortMinutes,
+      deadline: deadlineToDate(chips.deadline, chips.pickedISO),
+    })
+    navigate('/tasks')
+  }
+
+  function handleToggleComplete() {
+    void setTaskCompleted(task!, !isCompleted)
     navigate('/tasks')
   }
 
@@ -80,10 +86,19 @@ export function TaskDetailScreen() {
       }
       footer={
         <div className={styles.footerPad}>
-          <Button fullWidth onClick={handleComplete}>
-            <CheckIcon size={16} />
-            Mark complete
+          <Button fullWidth onClick={handleToggleComplete}>
+            {isCompleted ? (
+              'Mark not done'
+            ) : (
+              <>
+                <CheckIcon size={16} />
+                Mark complete
+              </>
+            )}
           </Button>
+          <button className={styles.deleteBtn} onClick={() => setConfirmingDelete(true)}>
+            Delete task
+          </button>
         </div>
       }
     >
@@ -91,39 +106,31 @@ export function TaskDetailScreen() {
         <button className={styles.back} onClick={() => navigate('/tasks')}>
           ← Tasks
         </button>
-        <button className={styles.delete} onClick={() => setConfirmingDelete(true)}>
-          Delete
+        <button className={styles.save} disabled={!canSave} onClick={handleSave}>
+          Save
         </button>
       </div>
 
-      <div className={styles.title}>{task.title}</div>
-
-      {showScores && (
-        <Card className={styles.scoreCard}>
-          <div className={styles.scoreRow}>
-            <div className={cn(styles.score, positive ? styles.pos : styles.neg)}>
-              {positive ? `+${view.live}` : `−${Math.abs(view.live)}`}
-            </div>
-            <div className={styles.bleed}>−{view.bleed}/day</div>
-          </div>
-          <div className={styles.scoreNote}>{SCORE_NOTE[view.tier]}</div>
-        </Card>
-      )}
-
-      <div className={styles.row}>
-        <div className={styles.rowLabel}>Deadline</div>
-        <div className={styles.rowValue}>{deadlineText}</div>
-      </div>
-      <div className={styles.row}>
-        <div className={styles.rowLabel}>Effort</div>
-        <div className={styles.rowValue}>{effortLabel(task.effortMinutes)}</div>
-      </div>
-      {task.notes && (
-        <div className={styles.notesBlock}>
-          <div className={styles.notesLabel}>Notes</div>
-          <div className={styles.notesText}>{task.notes}</div>
-        </div>
-      )}
+      <textarea
+        className={styles.title}
+        placeholder="Task title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+      <textarea
+        className={styles.notes}
+        placeholder="Add a note (optional)"
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+      />
+      <SectionLabel className={styles.label}>Category</SectionLabel>
+      <input
+        className={styles.textInput}
+        placeholder="Personal / Work / Errands…"
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+      />
+      <TaskChips value={chips} onChange={patch} />
     </Screen>
   )
 }
