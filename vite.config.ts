@@ -67,6 +67,8 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
         navigateFallback: '/index.html',
         cleanupOutdatedCaches: true,
+        // Custom SW logic (Periodic Background Sync handler).
+        importScripts: ['sw-custom.js'],
       },
       devOptions: { enabled: false },
     }),

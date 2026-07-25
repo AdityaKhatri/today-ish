@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { App } from './App'
 import { AuthProvider } from '@/auth/AuthProvider'
+import { PreferencesProvider } from '@/state/PreferencesContext'
 import { ProfileProvider } from '@/state/ProfileContext'
 import { initViewportHeight } from '@/lib/viewport'
 import { setupPWA } from './pwa'
@@ -17,7 +18,9 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <AuthProvider>
         <ProfileProvider>
-          <App />
+          <PreferencesProvider>
+            <App />
+          </PreferencesProvider>
         </ProfileProvider>
       </AuthProvider>
     </BrowserRouter>

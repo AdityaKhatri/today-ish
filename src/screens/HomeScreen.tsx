@@ -14,11 +14,11 @@ import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import { useAuth } from '@/auth/useAuth'
 import { useData } from '@/data/DataProvider'
 import { formatLongDate } from '@/lib/dates'
-import { SHOW_SCORES } from '@/lib/features'
 import { PROFILE_OPTIONS } from '@/lib/profileOptions'
 import type { UrgencyTier } from '@/lib/scoring'
 import { matchesProfile } from '@/lib/taskFilters'
 import { buildRoutineView, buildTaskView, routineActiveOn, sumBleed, sumLive } from '@/lib/views'
+import { useShowScores } from '@/state/PreferencesContext'
 import { useProfile } from '@/state/ProfileContext'
 import { useNow } from '@/state/useNow'
 import styles from './HomeScreen.module.css'
@@ -32,6 +32,7 @@ export function HomeScreen() {
   const { filter, setFilter } = useProfile()
   const { tasks, routines, todayLogs, setTaskCompleted, toggleRoutine } = useData()
   const now = useNow() // re-render each minute so scores/urgency stay live
+  const showScores = useShowScores()
 
   const firstName = user?.displayName?.split(' ')[0] ?? 'there'
 
@@ -99,7 +100,7 @@ export function HomeScreen() {
         </button>
       </div>
 
-      {SHOW_SCORES && (
+      {showScores && (
         <div className={styles.score}>
           <ScoreHeadline potential={sumLive(activeViews)} bleed={sumBleed(activeViews)} />
         </div>

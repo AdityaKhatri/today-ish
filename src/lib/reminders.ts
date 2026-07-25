@@ -28,6 +28,25 @@ export function setRemindersPref(on: boolean): void {
   window.dispatchEvent(new Event('reminders-changed'))
 }
 
+// ── Frequency (how often to nudge about tasks) ──────────────────────────────
+//   low    → one digest a day (morning)
+//   medium → morning / midday / evening digests            [default]
+//   high   → the digests + per-task "due soon / overdue" alerts
+
+export type ReminderFrequency = 'low' | 'medium' | 'high'
+
+const FREQ_KEY = 'today-ish.reminderFrequency'
+
+export function getReminderFrequency(): ReminderFrequency {
+  const v = localStorage.getItem(FREQ_KEY)
+  return v === 'low' || v === 'high' ? v : 'medium'
+}
+
+export function setReminderFrequency(f: ReminderFrequency): void {
+  localStorage.setItem(FREQ_KEY, f)
+  window.dispatchEvent(new Event('reminders-changed'))
+}
+
 /** Request permission (if needed) and record the opt-in. Returns the resulting state. */
 export async function requestReminders(): Promise<NotifPermission> {
   const current = notifPermission()

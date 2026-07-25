@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { setDoc } from 'firebase/firestore'
 import { useAuth } from '@/auth/useAuth'
+import { registerPeriodicReminders } from '@/lib/backgroundSync'
 import { localDateKey } from '@/lib/dates'
 import { registerFcmToken, setupForegroundMessages } from '@/lib/fcm'
 import { isRemindersOn } from '@/lib/reminders'
@@ -100,7 +101,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
       void setDoc(userDocRef(uid), { remindersEnabled: on, timezone: tz }, { merge: true }).catch(
         () => {},
       )
-      if (on) void registerFcmToken(uid)
+      if (on) {
+        void registerFcmToken(uid)
+        void registerPeriodicReminders()
+      }
     }
     sync()
     const onFocus = () => {

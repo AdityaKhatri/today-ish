@@ -1,6 +1,6 @@
 import { CheckIcon } from '@/components/icons'
 import { cn } from '@/lib/cn'
-import { SHOW_SCORES } from '@/lib/features'
+import { useShowScores } from '@/state/PreferencesContext'
 import type { UrgencyTier } from '@/lib/scoring'
 import type { TaskView } from '@/lib/views'
 import styles from './TaskCard.module.css'
@@ -27,6 +27,7 @@ export function TaskCard({
   done?: boolean
 }) {
   const positive = task.live >= 0
+  const showScores = useShowScores()
   return (
     <div className={styles.card}>
       <button
@@ -43,7 +44,7 @@ export function TaskCard({
       <button type="button" className={styles.body} onClick={onClick}>
         <span className={styles.row}>
           <span className={cn(styles.title, done && styles.doneTitle)}>{task.title}</span>
-          {SHOW_SCORES && (
+          {showScores && (
             <span className={styles.scoreWrap}>
               <span className={cn(styles.score, positive ? styles.pos : styles.neg)}>
                 {scoreLabel(task.live)}

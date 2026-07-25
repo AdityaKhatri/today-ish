@@ -6,7 +6,6 @@ import { Card } from '@/components/ui/Card'
 import { ChoiceChip } from '@/components/ui/ChoiceChip'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { useData } from '@/data/DataProvider'
-import { SHOW_SCORES } from '@/lib/features'
 import { localDateKey } from '@/lib/dates'
 import {
   EFFORT_OPTIONS,
@@ -16,6 +15,7 @@ import {
   urgencyMultiplierForDeadline,
 } from '@/lib/scoring'
 import type { Profile } from '@/types/models'
+import { useShowScores } from '@/state/PreferencesContext'
 import { useProfile } from '@/state/ProfileContext'
 import styles from './AddTaskScreen.module.css'
 
@@ -53,6 +53,7 @@ export function AddTaskScreen() {
   const navigate = useNavigate()
   const { activeProfile } = useProfile()
   const { createTask } = useData()
+  const showScores = useShowScores()
 
   const titleRef = useRef<HTMLTextAreaElement>(null)
   const [step, setStep] = useState<1 | 2>(1)
@@ -206,7 +207,7 @@ export function AddTaskScreen() {
         ))}
       </div>
 
-      {SHOW_SCORES && (
+      {showScores && (
         <Card className={styles.preview}>
           <SectionLabel small>If done today</SectionLabel>
           <div className={styles.previewRow} style={{ marginTop: 8 }}>

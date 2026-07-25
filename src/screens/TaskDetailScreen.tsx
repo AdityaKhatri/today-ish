@@ -7,11 +7,11 @@ import { Card } from '@/components/ui/Card'
 import { ConfirmSheet } from '@/components/ui/ConfirmSheet'
 import { useData } from '@/data/DataProvider'
 import { cn } from '@/lib/cn'
-import { SHOW_SCORES } from '@/lib/features'
 import { relativeDeadlineLabel } from '@/lib/dates'
 import { effortLabel } from '@/lib/scoring'
 import type { UrgencyTier } from '@/lib/scoring'
 import { buildTaskView } from '@/lib/views'
+import { useShowScores } from '@/state/PreferencesContext'
 import { useNow } from '@/state/useNow'
 import styles from './TaskDetailScreen.module.css'
 
@@ -26,6 +26,7 @@ export function TaskDetailScreen() {
   const { id } = useParams()
   const { tasks, setTaskCompleted, deleteTask } = useData()
   const now = useNow() // keep the live score fresh
+  const showScores = useShowScores()
   const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   const task = tasks.find((t) => t.id === id)
@@ -97,7 +98,7 @@ export function TaskDetailScreen() {
 
       <div className={styles.title}>{task.title}</div>
 
-      {SHOW_SCORES && (
+      {showScores && (
         <Card className={styles.scoreCard}>
           <div className={styles.scoreRow}>
             <div className={cn(styles.score, positive ? styles.pos : styles.neg)}>

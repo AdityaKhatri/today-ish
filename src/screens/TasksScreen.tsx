@@ -9,7 +9,6 @@ import { Screen } from '@/components/layout/Screen'
 import { Button } from '@/components/ui/Button'
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import { useData } from '@/data/DataProvider'
-import { SHOW_SCORES } from '@/lib/features'
 import { PROFILE_OPTIONS } from '@/lib/profileOptions'
 import type { UrgencyTier } from '@/lib/scoring'
 import {
@@ -19,6 +18,7 @@ import {
   matchesTimeframe,
 } from '@/lib/taskFilters'
 import { buildTaskView, sumBleed, sumLive } from '@/lib/views'
+import { useShowScores } from '@/state/PreferencesContext'
 import { useProfile } from '@/state/ProfileContext'
 import { useNow } from '@/state/useNow'
 import styles from './TasksScreen.module.css'
@@ -30,6 +30,7 @@ export function TasksScreen() {
   const { filter, setFilter } = useProfile()
   const { tasks, setTaskCompleted } = useData()
   const now = useNow() // keep scores/urgency live while the tab is open
+  const showScores = useShowScores()
   const [filters, setFilters] = useState<TaskFilterState>(DEFAULT_TASK_FILTERS)
 
   // Category chips reflect the categories present in the current profile.
@@ -83,7 +84,7 @@ export function TasksScreen() {
         <SegmentedControl options={PROFILE_OPTIONS} value={filter} onChange={setFilter} large />
       </div>
 
-      {SHOW_SCORES && (
+      {showScores && (
         <div className={styles.score}>
           <ScoreHeadline potential={sumLive(activeViews)} bleed={sumBleed(activeViews)} compact />
         </div>
