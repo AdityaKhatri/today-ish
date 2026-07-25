@@ -18,6 +18,10 @@ export interface UserDoc {
   photoURL: string
   createdAt: Timestamp
   defaultProfile: Profile
+  /** Set by the client so the Cloud Function knows whether to send push. */
+  remindersEnabled?: boolean
+  /** IANA timezone (client) — the function uses it for local routine times. */
+  timezone?: string
 }
 
 // ── /users/{uid}/tasks/{taskId} ──────────────────────────────────────────────

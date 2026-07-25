@@ -4,11 +4,22 @@ import { Screen } from '@/components/layout/Screen'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { cn } from '@/lib/cn'
 import { useAuth } from '@/auth/useAuth'
+import { useReminders } from '@/state/useReminders'
 import styles from './SettingsScreen.module.css'
 
 export function SettingsScreen() {
   const navigate = useNavigate()
   const { signOutNow } = useAuth()
+  const { permission, enabled, enable, disable } = useReminders()
+
+  const reminderSub =
+    permission === 'unsupported'
+      ? 'Not supported on this device'
+      : permission === 'denied'
+        ? 'Blocked — enable in device settings'
+        : enabled
+          ? 'On'
+          : 'Off'
 
   return (
     <Screen footer={<BottomNav />} contentClassName={styles.content}>
@@ -46,11 +57,22 @@ export function SettingsScreen() {
       <div className={styles.actionCard}>
         <div>
           <div className={styles.actionTitle}>Reminders</div>
-          <div className={styles.actionSub}>Currently off</div>
+          <div className={styles.actionSub}>{reminderSub}</div>
         </div>
-        <button className={styles.turnOn} onClick={() => navigate('/reminders')}>
-          Turn on
-        </button>
+        {permission !== 'unsupported' &&
+          permission !== 'denied' &&
+          (enabled ? (
+            <button className={styles.turnOff} onClick={disable}>
+              Turn off
+            </button>
+          ) : (
+            <button
+              className={styles.turnOn}
+              onClick={() => (permission === 'granted' ? void enable() : navigate('/reminders'))}
+            >
+              Turn on
+            </button>
+          ))}
       </div>
 
       <SectionLabel small className={styles.sectionLabel}>

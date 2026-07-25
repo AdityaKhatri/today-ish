@@ -1,22 +1,20 @@
 import { useNavigate } from 'react-router-dom'
 import { BellIcon } from '@/components/icons'
 import { Button } from '@/components/ui/Button'
+import { requestReminders } from '@/lib/reminders'
 import styles from './NotificationPrePromptScreen.module.css'
 
 /**
- * App-owned notification pre-prompt. It is ALWAYS shown before the raw browser
- * permission dialog would be.
- *
- * DEFERRED build: reminders are in-app only (no FCM / background push on the
- * Spark plan), so both buttons are inert and just dismiss. The screen + flow are
- * built so nothing changes structurally when push lands.
+ * App-owned notification pre-prompt, always shown before the raw browser
+ * permission dialog. "Turn on" requests the Web Notification permission and
+ * records the opt-in; in-app reminders then fire while the app is open. (FCM /
+ * background push when fully closed is the future Blaze build.)
  */
 export function NotificationPrePromptScreen() {
   const navigate = useNavigate()
 
-  function handleTurnOn() {
-    // FUTURE (Blaze + FCM): request Notification permission here, then register
-    // the FCM token. For now this is a no-op that dismisses the screen.
+  async function handleTurnOn() {
+    await requestReminders()
     navigate(-1)
   }
 

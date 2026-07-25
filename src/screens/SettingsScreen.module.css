@@ -75,6 +75,16 @@
   font-weight: 700;
 }
 
+.turnOff {
+  background: var(--color-surface-warm);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 11px 16px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .showMe {
   font-size: 13px;
   font-weight: 700;

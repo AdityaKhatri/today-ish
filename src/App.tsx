@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { AppRoutes } from '@/app/AppRoutes'
+import { ReminderRunner } from '@/components/ReminderRunner'
 import { Splash } from '@/components/Splash'
 import { DataProvider } from '@/data/DataProvider'
 import { NotAuthorizedScreen } from '@/screens/NotAuthorizedScreen'
@@ -28,6 +29,7 @@ export function App() {
   if (status === 'denied') return <NotAuthorizedScreen />
   return (
     <DataProvider>
+      <ReminderRunner />
       <AppRoutes />
     </DataProvider>
   )
