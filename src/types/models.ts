@@ -77,7 +77,8 @@ export interface Routine {
 
 // ── /users/{uid}/routineLogs/{routineId}_{date} ──────────────────────────────
 
-export type RoutineLogStatus = 'done' | 'missed'
+/** "pending" = a multi routine with partial progress (count < target). */
+export type RoutineLogStatus = 'done' | 'missed' | 'pending'
 
 export interface RoutineLog {
   id: string

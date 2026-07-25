@@ -10,7 +10,7 @@ import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import { useData } from '@/data/DataProvider'
 import { PROFILE_OPTIONS } from '@/lib/profileOptions'
 import { matchesProfile } from '@/lib/taskFilters'
-import { buildRoutineView, isRoutineDone, routineActiveOn } from '@/lib/views'
+import { buildRoutineView, routineActiveOn } from '@/lib/views'
 import { useProfile } from '@/state/ProfileContext'
 import { useNow } from '@/state/useNow'
 import styles from './RoutinesScreen.module.css'
@@ -18,7 +18,7 @@ import styles from './RoutinesScreen.module.css'
 export function RoutinesScreen() {
   const navigate = useNavigate()
   const { filter, setFilter } = useProfile()
-  const { routines, todayLogs, setRoutineDone } = useData()
+  const { routines, todayLogs, toggleRoutine } = useData()
   const now = useNow()
 
   const { rows, doneCount, total, maxStreak } = useMemo(() => {
@@ -73,7 +73,9 @@ export function RoutinesScreen() {
           <RoutineRow
             key={routine.id}
             routine={view}
-            onToggle={() => setRoutineDone(routine, !isRoutineDone(routine, todayLogs[routine.id]))}
+            onToggle={() => {
+              void toggleRoutine(routine).catch((e) => console.error('[routine] toggle failed', e))
+            }}
           />
         ))
       ) : (

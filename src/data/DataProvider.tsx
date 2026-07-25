@@ -18,9 +18,9 @@ import type { NewTaskInput } from './tasks'
 import {
   createRoutine as createRoutineFn,
   deleteRoutine as deleteRoutineFn,
-  setRoutineDone as setRoutineDoneFn,
   subscribeLogsForDate,
   subscribeRoutines,
+  toggleRoutine as toggleRoutineFn,
   updateRoutine as updateRoutineFn,
 } from './routines'
 import type { NewRoutineInput } from './routines'
@@ -39,7 +39,7 @@ interface DataContextValue {
   createRoutine: (input: NewRoutineInput) => Promise<void>
   updateRoutine: (id: string, patch: Partial<NewRoutineInput>) => Promise<void>
   deleteRoutine: (id: string) => Promise<void>
-  setRoutineDone: (routine: Routine, done: boolean) => Promise<void>
+  toggleRoutine: (routine: Routine) => Promise<void>
 }
 
 const DataContext = createContext<DataContextValue | null>(null)
@@ -128,7 +128,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       createRoutine: (input) => createRoutineFn(uid!, input),
       updateRoutine: (id, patch) => updateRoutineFn(uid!, id, patch),
       deleteRoutine: (id) => deleteRoutineFn(uid!, id),
-      setRoutineDone: (routine, done) => setRoutineDoneFn(uid!, routine, today, done),
+      toggleRoutine: (routine) => toggleRoutineFn(uid!, routine, today, todayLogs[routine.id]),
     }),
     [uid, tasksLoaded, routinesLoaded, error, today, tasks, routines, todayLogs],
   )

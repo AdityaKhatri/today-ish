@@ -4,15 +4,15 @@ import {
   deleteDoc,
   onSnapshot,
   query,
-  runTransaction,
   serverTimestamp,
+  setDoc,
   updateDoc,
   where,
 } from 'firebase/firestore'
 import type { FirestoreError } from 'firebase/firestore'
-import { db } from '@/firebase/config'
 import { routineDocRef, routineLogDocRef, routineLogsCol, routinesCol } from './paths'
 import { previousDateKey } from '@/lib/dates'
+import { isRoutineDone } from '@/lib/views'
 import type { Profile, Routine, RoutineLog, RoutineWindow } from '@/types/models'
 
 export interface NewRoutineInput {
@@ -92,52 +92,75 @@ export async function deleteRoutine(uid: string, id: string): Promise<void> {
 }
 
 /**
- * Mark a routine done / not-done for `date`, maintaining streak counters
- * transactionally on the routine doc (the fast-path number the UI reads). The
- * routineLog write is idempotent (doc id embeds the date).
+ * Advance a routine's state for `date` on tap.
+ *
+ * INSTANT-OPTIMISTIC (no transaction — transactions need a server round-trip and
+ * fail offline). Plain setDoc/updateDoc/deleteDoc apply to the local cache
+ * immediately, reflect in the live subscription right away, and sync later.
+ *
+ * - Simple routines toggle done ↔ not-done.
+ * - "multi" (few-times-a-day) routines ROTATE the count: e.g. target 3 →
+ *   1 → 2 → 3 → 0 → 1 … "done" is count ≥ target.
+ *
+ * Streak counters on the routine doc are maintained best-effort (last-write-wins
+ * across devices is fine per the brief). Every tap is timestamped
+ * (completedAt/updatedAt) on the routineLog audit doc.
  */
-export async function setRoutineDone(
+export async function toggleRoutine(
   uid: string,
   routine: Routine,
   date: string,
-  done: boolean,
+  currentLog: RoutineLog | undefined,
 ): Promise<void> {
   const rRef = routineDocRef(uid, routine.id)
   const lRef = routineLogDocRef(uid, routine.id, date)
 
-  await runTransaction(db, async (txn) => {
-    const rSnap = await txn.get(rRef)
-    if (!rSnap.exists()) return
-    const r = rSnap.data() as Omit<Routine, 'id'>
+  const isMulti = routine.windowType === 'multi'
+  const target = isMulti ? Math.max(1, routine.targetCount ?? 1) : 1
 
-    if (done) {
-      const prev = previousDateKey(date)
-      let currentStreak: number
-      if (r.lastCompletedDate === date) currentStreak = r.currentStreak
-      else if (r.lastCompletedDate === prev) currentStreak = r.currentStreak + 1
-      else currentStreak = 1
-      const longestStreak = Math.max(r.longestStreak ?? 0, currentStreak)
+  const currentCount = currentLog?.count ?? (currentLog?.status === 'done' ? target : 0)
+  const nextCount = (currentCount + 1) % (target + 1) // rotate 0..target
 
-      const log: Record<string, unknown> = {
-        routineId: routine.id,
-        date,
-        status: 'done',
-        completedAt: Timestamp.now(), // CLIENT clock at the tap
-      }
-      if (routine.windowType === 'multi') log.count = routine.targetCount ?? 1
+  const wasDone = isRoutineDone(routine, currentLog)
+  const nowDone = nextCount >= target
+  const now = Timestamp.now()
 
-      txn.set(lRef, log)
-      txn.update(rRef, { currentStreak, longestStreak, lastCompletedDate: date })
-    } else {
-      // Undo today's completion. Reverting the streak precisely would need the
-      // prior completion date; we conservatively step back one and clear the
-      // marker (a re-complete re-derives from there).
-      txn.delete(lRef)
-      const revert = r.lastCompletedDate === date
-      txn.update(rRef, {
-        currentStreak: revert ? Math.max(0, r.currentStreak - 1) : r.currentStreak,
-        lastCompletedDate: revert ? null : r.lastCompletedDate,
-      })
-    }
+  // eslint-disable-next-line no-console
+  console.info('[routine] tap', routine.title, {
+    from: currentCount,
+    to: nextCount,
+    at: now.toDate().toISOString(),
   })
+
+  if (nextCount === 0) {
+    await deleteDoc(lRef)
+  } else {
+    await setDoc(lRef, {
+      routineId: routine.id,
+      date,
+      status: nowDone ? 'done' : 'pending',
+      count: nextCount,
+      completedAt: now, // CLIENT clock at the tap
+      updatedAt: now,
+    })
+  }
+
+  // Maintain the streak only on the done ↔ not-done transitions.
+  if (nowDone && !wasDone) {
+    const prev = previousDateKey(date)
+    let currentStreak: number
+    if (routine.lastCompletedDate === date) currentStreak = routine.currentStreak
+    else if (routine.lastCompletedDate === prev) currentStreak = routine.currentStreak + 1
+    else currentStreak = 1
+    await updateDoc(rRef, {
+      currentStreak,
+      longestStreak: Math.max(routine.longestStreak ?? 0, currentStreak),
+      lastCompletedDate: date,
+    })
+  } else if (!nowDone && wasDone && routine.lastCompletedDate === date) {
+    await updateDoc(rRef, {
+      currentStreak: Math.max(0, routine.currentStreak - 1),
+      lastCompletedDate: null,
+    })
+  }
 }
