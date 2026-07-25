@@ -28,7 +28,7 @@ const TIER_RANK: Record<UrgencyTier, number> = { red: 0, amber: 1, green: 2 }
 export function TasksScreen() {
   const navigate = useNavigate()
   const { filter, setFilter } = useProfile()
-  const { tasks } = useData()
+  const { tasks, setTaskCompleted } = useData()
   const now = useNow() // keep scores/urgency live while the tab is open
   const [filters, setFilters] = useState<TaskFilterState>(DEFAULT_TASK_FILTERS)
 
@@ -51,7 +51,7 @@ export function TasksScreen() {
           matchesDueDate(t, filters.dueDate) &&
           (filters.category === 'all' || t.category === filters.category),
       )
-      .map((t) => ({ id: t.id, view: buildTaskView(t, now), done: t.status === 'completed' }))
+      .map((t) => ({ id: t.id, task: t, view: buildTaskView(t, now), done: t.status === 'completed' }))
       .sort(
         (a, b) =>
           Number(a.done) - Number(b.done) || // completed sink to the bottom
@@ -97,6 +97,7 @@ export function TasksScreen() {
             key={r.id}
             task={r.view}
             done={r.done}
+            onToggleDone={() => void setTaskCompleted(r.task, !r.done)}
             onClick={() => navigate(`/tasks/${r.id}`)}
           />
         ))

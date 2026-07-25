@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PlusIcon } from '@/components/icons'
 import { Wordmark } from '@/components/Logo'
+import { RoutineRow } from '@/components/domain/RoutineRow'
 import { ScoreHeadline } from '@/components/domain/ScoreHeadline'
 import { TaskCard } from '@/components/domain/TaskCard'
 import { BottomNav } from '@/components/layout/BottomNav'
@@ -12,43 +13,71 @@ import { SectionLabel } from '@/components/ui/SectionLabel'
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import { useAuth } from '@/auth/useAuth'
 import { useData } from '@/data/DataProvider'
-import { SHOW_SCORES } from '@/lib/features'
 import { formatLongDate } from '@/lib/dates'
+import { SHOW_SCORES } from '@/lib/features'
 import { PROFILE_OPTIONS } from '@/lib/profileOptions'
 import type { UrgencyTier } from '@/lib/scoring'
 import { matchesProfile } from '@/lib/taskFilters'
-import { buildTaskView, isRoutineDone, routineActiveOn, sumBleed, sumLive } from '@/lib/views'
+import { buildRoutineView, buildTaskView, routineActiveOn, sumBleed, sumLive } from '@/lib/views'
 import { useProfile } from '@/state/ProfileContext'
 import { useNow } from '@/state/useNow'
 import styles from './HomeScreen.module.css'
 
 const TIER_RANK: Record<UrgencyTier, number> = { red: 0, amber: 1, green: 2 }
+const DAY_MS = 24 * 60 * 60 * 1000
 
 export function HomeScreen() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { filter, setFilter } = useProfile()
-  const { tasks, routines, todayLogs } = useData()
+  const { tasks, routines, todayLogs, setTaskCompleted, toggleRoutine } = useData()
   const now = useNow() // re-render each minute so scores/urgency stay live
 
   const firstName = user?.displayName?.split(' ')[0] ?? 'there'
 
-  const views = useMemo(
-    () =>
-      tasks
-        .filter((t) => t.status === 'active' && matchesProfile(t.profile, filter))
-        .map((t) => buildTaskView(t, now))
-        .sort((a, b) => TIER_RANK[a.tier] - TIER_RANK[b.tier] || b.bleed - a.bleed),
-    [tasks, filter, now],
-  )
-  const topPriorities = views.slice(0, 4)
+  // Active tasks + anything completed in the last 24h (so a just-checked task
+  // doesn't vanish from the list immediately).
+  const taskRows = useMemo(() => {
+    const cutoff = now - DAY_MS
+    return tasks
+      .filter(
+        (t) =>
+          matchesProfile(t.profile, filter) &&
+          (t.status === 'active' ||
+            (t.status === 'completed' && (t.completedAt?.toMillis() ?? 0) >= cutoff)),
+      )
+      .map((t) => ({
+        task: t,
+        view: buildTaskView(t, now),
+        done: t.status === 'completed',
+        completedAt: t.completedAt?.toMillis() ?? 0,
+      }))
+      .sort((a, b) => {
+        if (a.done !== b.done) return Number(a.done) - Number(b.done) // active first
+        if (a.done) return b.completedAt - a.completedAt // most-recently-done first
+        return TIER_RANK[a.view.tier] - TIER_RANK[b.view.tier] || b.view.bleed - a.view.bleed
+      })
+  }, [tasks, filter, now])
 
-  const { doneCount, total, maxStreak } = useMemo(() => {
-    const dow = new Date(now).getDay()
-    const active = routines.filter((r) => matchesProfile(r.profile, filter) && routineActiveOn(r, dow))
+  const activeViews = useMemo(
+    () => taskRows.filter((r) => !r.done).map((r) => r.view),
+    [taskRows],
+  )
+
+  const { routineRows, doneCount, total, maxStreak } = useMemo(() => {
+    const nowDate = new Date(now)
+    const dow = nowDate.getDay()
+    const active = routines.filter(
+      (r) => matchesProfile(r.profile, filter) && routineActiveOn(r, dow),
+    )
+    const built = active.map((r) => ({
+      routine: r,
+      view: buildRoutineView(r, todayLogs[r.id], nowDate),
+    }))
     return {
-      doneCount: active.filter((r) => isRoutineDone(r, todayLogs[r.id])).length,
-      total: active.length,
+      routineRows: built,
+      doneCount: built.filter((b) => b.view.status === 'done').length,
+      total: built.length,
       maxStreak: active.reduce((m, r) => Math.max(m, r.currentStreak), 0),
     }
   }, [routines, todayLogs, filter, now])
@@ -72,7 +101,7 @@ export function HomeScreen() {
 
       {SHOW_SCORES && (
         <div className={styles.score}>
-          <ScoreHeadline potential={sumLive(views)} bleed={sumBleed(views)} />
+          <ScoreHeadline potential={sumLive(activeViews)} bleed={sumBleed(activeViews)} />
         </div>
       )}
 
@@ -80,10 +109,16 @@ export function HomeScreen() {
         <SegmentedControl options={PROFILE_OPTIONS} value={filter} onChange={setFilter} />
       </div>
 
-      <SectionLabel className={styles.priorityLabel}>Top priorities</SectionLabel>
-      {topPriorities.length > 0 ? (
-        topPriorities.map((t) => (
-          <TaskCard key={t.id} task={t} onClick={() => navigate(`/tasks/${t.id}`)} />
+      <SectionLabel className={styles.priorityLabel}>Tasks</SectionLabel>
+      {taskRows.length > 0 ? (
+        taskRows.map((r) => (
+          <TaskCard
+            key={r.task.id}
+            task={r.view}
+            done={r.done}
+            onToggleDone={() => void setTaskCompleted(r.task, !r.done)}
+            onClick={() => navigate(`/tasks/${r.task.id}`)}
+          />
         ))
       ) : (
         <div className={styles.empty}>Nothing pressing. Enjoy the breathing room.</div>
@@ -101,6 +136,20 @@ export function HomeScreen() {
           </div>
         </div>
       </button>
+
+      {routineRows.length > 0 ? (
+        routineRows.map(({ routine, view }) => (
+          <RoutineRow
+            key={routine.id}
+            routine={view}
+            onToggle={() => {
+              void toggleRoutine(routine).catch((e) => console.error('[routine] toggle failed', e))
+            }}
+          />
+        ))
+      ) : (
+        <div className={styles.empty}>No routines for today.</div>
+      )}
     </Screen>
   )
 }

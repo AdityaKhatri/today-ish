@@ -24,7 +24,7 @@ const SCORE_NOTE: Record<UrgencyTier, string> = {
 export function TaskDetailScreen() {
   const navigate = useNavigate()
   const { id } = useParams()
-  const { tasks, completeTask, deleteTask } = useData()
+  const { tasks, setTaskCompleted, deleteTask } = useData()
   const now = useNow() // keep the live score fresh
   const [confirmingDelete, setConfirmingDelete] = useState(false)
 
@@ -53,7 +53,7 @@ export function TaskDetailScreen() {
   function handleComplete() {
     // Instant-optimistic: the local cache reflects the write immediately, and
     // completeTask captures scoreAtCompletion + a client Timestamp at the tap.
-    void completeTask(task!)
+    void setTaskCompleted(task!, true)
     navigate('/tasks')
   }
 

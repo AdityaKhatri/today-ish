@@ -1,10 +1,16 @@
-import { UrgencyDot } from '@/components/ui/UrgencyDot'
+import { CheckIcon } from '@/components/icons'
 import { cn } from '@/lib/cn'
 import { SHOW_SCORES } from '@/lib/features'
+import type { UrgencyTier } from '@/lib/scoring'
 import type { TaskView } from '@/lib/views'
 import styles from './TaskCard.module.css'
 
-/** Signed score label: "+42" or "−8". */
+const TIER_COLOR: Record<UrgencyTier, string> = {
+  red: 'var(--color-red)',
+  amber: 'var(--color-amber)',
+  green: 'var(--color-green)',
+}
+
 function scoreLabel(n: number): string {
   return n < 0 ? `−${Math.abs(n)}` : `+${n}`
 }
@@ -12,30 +18,42 @@ function scoreLabel(n: number): string {
 export function TaskCard({
   task,
   onClick,
+  onToggleDone,
   done,
 }: {
   task: TaskView
   onClick?: () => void
+  onToggleDone?: () => void
   done?: boolean
 }) {
   const positive = task.live >= 0
   return (
-    <button type="button" className={cn(styles.card, done && styles.done)} onClick={onClick}>
-      <div className={styles.row}>
-        <div className={styles.titleWrap}>
-          {done ? <span className={styles.check}>✓</span> : <UrgencyDot tier={task.tier} />}
+    <div className={styles.card}>
+      <button
+        type="button"
+        className={cn(styles.check, done && styles.checkDone)}
+        // Unchecked: the ring carries the urgency color. Checked: solid green.
+        style={done ? undefined : { borderColor: TIER_COLOR[task.tier] }}
+        aria-label={done ? 'Mark not done' : 'Mark done'}
+        aria-pressed={done}
+        onClick={onToggleDone}
+      >
+        {done && <CheckIcon size={13} />}
+      </button>
+      <button type="button" className={styles.body} onClick={onClick}>
+        <span className={styles.row}>
           <span className={cn(styles.title, done && styles.doneTitle)}>{task.title}</span>
-        </div>
-        {SHOW_SCORES && (
-          <div className={styles.scoreWrap}>
-            <div className={cn(styles.score, positive ? styles.pos : styles.neg)}>
-              {scoreLabel(task.live)}
-            </div>
-            <div className={styles.bleed}>−{task.bleed}/day</div>
-          </div>
-        )}
-      </div>
-      <div className={styles.meta}>{task.meta}</div>
-    </button>
+          {SHOW_SCORES && (
+            <span className={styles.scoreWrap}>
+              <span className={cn(styles.score, positive ? styles.pos : styles.neg)}>
+                {scoreLabel(task.live)}
+              </span>
+              <span className={styles.bleed}>−{task.bleed}/day</span>
+            </span>
+          )}
+        </span>
+        <span className={styles.meta}>{task.meta}</span>
+      </button>
+    </div>
   )
 }

@@ -9,9 +9,9 @@ import { useNow } from '@/state/useNow'
 import type { Routine, RoutineLog, Task } from '@/types/models'
 import { userDocRef } from './paths'
 import {
-  completeTask as completeTaskFn,
   createTask as createTaskFn,
   deleteTask as deleteTaskFn,
+  setTaskCompleted as setTaskCompletedFn,
   subscribeTasks,
 } from './tasks'
 import type { NewTaskInput } from './tasks'
@@ -34,7 +34,7 @@ interface DataContextValue {
   routines: Routine[]
   todayLogs: Record<string, RoutineLog>
   createTask: (input: NewTaskInput) => Promise<void>
-  completeTask: (task: Task) => Promise<void>
+  setTaskCompleted: (task: Task, completed: boolean) => Promise<void>
   deleteTask: (id: string) => Promise<void>
   createRoutine: (input: NewRoutineInput) => Promise<void>
   updateRoutine: (id: string, patch: Partial<NewRoutineInput>) => Promise<void>
@@ -123,7 +123,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       routines,
       todayLogs,
       createTask: (input) => createTaskFn(uid!, input),
-      completeTask: (task) => completeTaskFn(uid!, task),
+      setTaskCompleted: (task, completed) => setTaskCompletedFn(uid!, task, completed),
       deleteTask: (id) => deleteTaskFn(uid!, id),
       createRoutine: (input) => createRoutineFn(uid!, input),
       updateRoutine: (id, patch) => updateRoutineFn(uid!, id, patch),

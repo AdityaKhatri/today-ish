@@ -1,16 +1,41 @@
 .card {
-  display: block;
-  width: 100%;
-  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: 15px 16px;
+  padding: 13px 14px;
   margin-bottom: 10px;
 }
 
-.card:active:not(:disabled) {
-  transform: scale(0.985);
+.check {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  margin-top: 1px;
+  border-radius: 50%;
+  border: 2px solid var(--color-dash);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.checkDone {
+  background: var(--color-green);
+  border-color: var(--color-green);
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  display: block;
 }
 
 .row {
@@ -20,13 +45,6 @@
   gap: 10px;
 }
 
-.titleWrap {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  min-width: 0;
-}
-
 .title {
   font-size: 14px;
   font-weight: 600;
@@ -34,6 +52,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.doneTitle {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
 }
 
 .scoreWrap {
@@ -55,30 +78,15 @@
 }
 
 .bleed {
+  display: block;
   font-size: 11px;
   font-weight: 600;
   color: var(--color-red);
 }
 
 .meta {
+  display: block;
   font-size: 12px;
   color: var(--color-text-muted);
   margin-top: 3px;
-}
-
-.done {
-  opacity: 0.6;
-}
-
-.doneTitle {
-  text-decoration: line-through;
-}
-
-.check {
-  width: 8px;
-  flex: none;
-  color: var(--color-green);
-  font-weight: 800;
-  font-size: 12px;
-  line-height: 1;
 }

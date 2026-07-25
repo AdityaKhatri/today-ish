@@ -69,27 +69,44 @@ export async function createTask(uid: string, input: NewTaskInput): Promise<void
 }
 
 /**
- * Complete a task: lock in the live score at THIS instant and stamp a CLIENT
+ * Toggle a task between completed and active.
+ *
+ * Completing locks in the live score at THIS instant and stamps a CLIENT
  * timestamp (never serverTimestamp) so an offline completion credits the right
- * score against the decay curve when it later syncs.
+ * score against the decay curve when it later syncs. Reopening clears both, and
+ * refreshes completedAt-as-a-change-marker is NOT needed (status flips it back).
  */
+export async function setTaskCompleted(uid: string, task: Task, completed: boolean): Promise<void> {
+  if (completed) {
+    const now = Date.now()
+    const peak = peakScore(task.baseScore, task.urgencyMultiplier)
+    const deadlineMs = task.deadline ? task.deadline.toMillis() : Number.POSITIVE_INFINITY
+    const createdMs = task.createdAt ? task.createdAt.toMillis() : now
+    const scoreAtCompletion = liveScore({
+      peak,
+      decayRatePerDay: task.decayRatePerDay,
+      createdAt: createdMs,
+      deadline: deadlineMs,
+      now,
+    })
+    await updateDoc(taskDocRef(uid, task.id), {
+      status: 'completed',
+      completedAt: Timestamp.now(), // CLIENT clock at the tap; also the 24h "recently changed" marker
+      scoreAtCompletion,
+    })
+  } else {
+    // Reopened tasks are active, so they always show on Home/Tasks anyway.
+    await updateDoc(taskDocRef(uid, task.id), {
+      status: 'active',
+      completedAt: null,
+      scoreAtCompletion: null,
+    })
+  }
+}
+
+/** Convenience: complete a task (used by the detail screen's button). */
 export async function completeTask(uid: string, task: Task): Promise<void> {
-  const now = Date.now()
-  const peak = peakScore(task.baseScore, task.urgencyMultiplier)
-  const deadlineMs = task.deadline ? task.deadline.toMillis() : Number.POSITIVE_INFINITY
-  const createdMs = task.createdAt ? task.createdAt.toMillis() : now
-  const scoreAtCompletion = liveScore({
-    peak,
-    decayRatePerDay: task.decayRatePerDay,
-    createdAt: createdMs,
-    deadline: deadlineMs,
-    now,
-  })
-  await updateDoc(taskDocRef(uid, task.id), {
-    status: 'completed',
-    completedAt: Timestamp.now(),
-    scoreAtCompletion,
-  })
+  return setTaskCompleted(uid, task, true)
 }
 
 export async function deleteTask(uid: string, id: string): Promise<void> {
