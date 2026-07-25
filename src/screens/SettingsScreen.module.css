@@ -93,6 +93,13 @@
   border: none;
 }
 
+.messageRow {
+  padding: 13px 0;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
 .signOut {
   text-align: center;
   font-size: 14px;

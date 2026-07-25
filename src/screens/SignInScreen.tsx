@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { InstallHint } from '@/components/InstallHint'
 import { useAuth } from '@/auth/useAuth'
 import styles from './SignInScreen.module.css'
 
@@ -58,6 +59,8 @@ export function SignInScreen() {
       <div className={styles.note}>
         Today-ish is invite-only. If you weren&rsquo;t invited, sign-in won&rsquo;t unlock the app.
       </div>
+
+      <InstallHint />
     </div>
   )
 }

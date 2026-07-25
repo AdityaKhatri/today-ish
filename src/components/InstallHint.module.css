@@ -1,0 +1,28 @@
+.btn {
+  width: 100%;
+  max-width: 280px;
+  margin-top: 20px;
+}
+
+.ios {
+  margin-top: 24px;
+  max-width: 280px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.iosIcon {
+  color: var(--color-coral);
+  display: inline-flex;
+}
+
+.ios strong {
+  color: var(--color-text);
+  font-weight: 700;
+}

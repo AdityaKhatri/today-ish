@@ -1,0 +1,34 @@
+.snack {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(var(--nav-height) + 16px + var(--safe-bottom));
+  max-width: calc(var(--app-max-width) - 32px);
+  margin: 0 auto;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--color-text);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  box-shadow: 0 12px 30px -10px rgba(34, 48, 58, 0.5);
+  animation: page-enter var(--dur-enter) var(--ease-out) both;
+}
+
+.text {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.close {
+  flex: none;
+  color: rgba(255, 255, 255, 0.7);
+  background: none;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 2px;
+}

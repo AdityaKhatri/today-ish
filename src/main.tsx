@@ -6,6 +6,7 @@ import { AuthProvider } from '@/auth/AuthProvider'
 import { ProfileProvider } from '@/state/ProfileContext'
 import { initViewportHeight } from '@/lib/viewport'
 import { setupPWA } from './pwa'
+import '@/state/installPrompt' // attach the beforeinstallprompt listener ASAP
 import './styles/global.css'
 
 initViewportHeight()

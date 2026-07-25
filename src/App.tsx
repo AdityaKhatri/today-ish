@@ -1,7 +1,9 @@
 import { useEffect } from 'react'
+import type { ReactNode } from 'react'
 import { AppRoutes } from '@/app/AppRoutes'
 import { ReminderRunner } from '@/components/ReminderRunner'
 import { Splash } from '@/components/Splash'
+import { UpdateSnackbar } from '@/components/UpdateSnackbar'
 import { DataProvider } from '@/data/DataProvider'
 import { NotAuthorizedScreen } from '@/screens/NotAuthorizedScreen'
 import { SignInScreen } from '@/screens/SignInScreen'
@@ -24,13 +26,22 @@ export function App() {
     return () => window.clearTimeout(t)
   }, [])
 
-  if (status === 'loading' || status === 'checking') return <Splash />
-  if (status === 'signedOut') return <SignInScreen />
-  if (status === 'denied') return <NotAuthorizedScreen />
+  let content: ReactNode
+  if (status === 'loading' || status === 'checking') content = <Splash />
+  else if (status === 'signedOut') content = <SignInScreen />
+  else if (status === 'denied') content = <NotAuthorizedScreen />
+  else
+    content = (
+      <DataProvider>
+        <ReminderRunner />
+        <AppRoutes />
+      </DataProvider>
+    )
+
   return (
-    <DataProvider>
-      <ReminderRunner />
-      <AppRoutes />
-    </DataProvider>
+    <>
+      {content}
+      <UpdateSnackbar />
+    </>
   )
 }

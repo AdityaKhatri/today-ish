@@ -1,10 +1,28 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { execSync } from 'node:child_process'
 import path from 'node:path'
+
+// Build-time git/build metadata (works with the shallow checkout in CI).
+function git(cmd: string, fallback: string): string {
+  try {
+    return execSync(cmd).toString().trim()
+  } catch {
+    return fallback
+  }
+}
+const BUILD_COMMIT = git('git rev-parse --short=8 HEAD', 'local')
+const BUILD_MESSAGE = git('git log -1 --pretty=%s', 'local development build')
+const BUILD_TIME = new Date().toISOString()
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  define: {
+    __BUILD_COMMIT__: JSON.stringify(BUILD_COMMIT),
+    __BUILD_MESSAGE__: JSON.stringify(BUILD_MESSAGE),
+    __BUILD_TIME__: JSON.stringify(BUILD_TIME),
+  },
   plugins: [
     react(),
     VitePWA({

@@ -3,6 +3,7 @@ import { BottomNav } from '@/components/layout/BottomNav'
 import { Screen } from '@/components/layout/Screen'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { cn } from '@/lib/cn'
+import { BUILD, buildDateLabel } from '@/lib/buildInfo'
 import { useAuth } from '@/auth/useAuth'
 import { useReminders } from '@/state/useReminders'
 import styles from './SettingsScreen.module.css'
@@ -86,6 +87,21 @@ export function SettingsScreen() {
         <button className={styles.showMe} onClick={() => navigate('/install')}>
           Show me how
         </button>
+      </div>
+
+      <SectionLabel small className={styles.sectionLabel}>
+        About
+      </SectionLabel>
+      <div className={styles.listCard}>
+        <div className={cn(styles.row, styles.rowBordered)}>
+          <div className={styles.rowText}>Last updated</div>
+          <div className={styles.rowValue}>{buildDateLabel()}</div>
+        </div>
+        <div className={cn(styles.row, styles.rowBordered)}>
+          <div className={styles.rowText}>Build</div>
+          <div className={styles.rowValue}>{BUILD.commit}</div>
+        </div>
+        <div className={styles.messageRow}>{BUILD.message}</div>
       </div>
 
       <button className={styles.signOut} onClick={signOutNow}>
