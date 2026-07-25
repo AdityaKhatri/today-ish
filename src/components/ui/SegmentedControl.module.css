@@ -16,8 +16,9 @@
   background: none;
   border: none;
   transition:
-    background 0.15s ease,
-    color 0.15s ease;
+    transform var(--dur-press) var(--ease-out),
+    background-color var(--dur-press) var(--ease-out),
+    color var(--dur-press) var(--ease-out);
 }
 
 .large .seg {

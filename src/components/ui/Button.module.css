@@ -9,12 +9,8 @@
   padding: 18px 20px;
   border: none;
   transition:
-    transform 0.08s ease,
+    transform var(--dur-press) var(--ease-out),
     opacity 0.15s ease;
-}
-
-.btn:active {
-  transform: scale(0.985);
 }
 
 .btn:disabled {

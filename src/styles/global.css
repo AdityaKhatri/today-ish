@@ -63,6 +63,24 @@ button {
   border: none;
   background: none;
   color: inherit;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+
+/* Subtle press feedback on tap/click (large cards override with a gentler scale). */
+button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Gentle content entrance on page/route switches (persistent nav stays put). */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 input,

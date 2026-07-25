@@ -42,6 +42,8 @@
   border-radius: 0 0 var(--radius-sm) var(--radius-sm);
   padding: 14px;
   background: var(--color-surface);
+  transform-origin: top;
+  animation: page-enter var(--dur-enter) var(--ease-out) both;
 }
 
 .label {
@@ -66,6 +68,11 @@
   border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 600;
+  transition:
+    transform var(--dur-press) var(--ease-out),
+    background-color var(--dur-press) var(--ease-out),
+    color var(--dur-press) var(--ease-out),
+    border-color var(--dur-press) var(--ease-out);
 }
 
 .chipSelected {

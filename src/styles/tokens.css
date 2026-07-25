@@ -47,6 +47,11 @@
   /* --- Type ---------------------------------------------------------------- */
   --font-sans: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
 
+  /* --- Motion (micro-interactions) ----------------------------------------- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1); /* smooth, settles gently */
+  --dur-press: 130ms;
+  --dur-enter: 260ms;
+
   /* --- Layout -------------------------------------------------------------- */
   --app-max-width: 480px; /* mobile-first; caps width on desktop web      */
   --nav-height: 64px;

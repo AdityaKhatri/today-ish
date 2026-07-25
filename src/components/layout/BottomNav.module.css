@@ -18,6 +18,13 @@
   text-decoration: none;
   background: none;
   border: none;
+  transition:
+    transform var(--dur-press) var(--ease-out),
+    color var(--dur-press) var(--ease-out);
+}
+
+.item:active {
+  transform: scale(0.92);
 }
 
 .active {

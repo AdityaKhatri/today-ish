@@ -9,8 +9,8 @@
   margin-bottom: 10px;
 }
 
-.card:active {
-  transform: scale(0.995);
+.card:active:not(:disabled) {
+  transform: scale(0.985);
 }
 
 .row {

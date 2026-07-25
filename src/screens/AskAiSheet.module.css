@@ -4,6 +4,7 @@
   height: 100%;
   max-width: var(--app-max-width);
   margin: 0 auto;
+  animation: page-enter var(--dur-enter) var(--ease-out) both;
 }
 
 .head {
